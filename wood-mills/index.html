@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>US wood-products mills, a working sample</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;800&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>US wood-products mills, a working sample</h1>
+      <p class="sub">Each mark is a mill &mdash; pulp, paper, sawmill, plywood, OSB or MDF &mdash; found via public web research, not an official or complete list. It appears the year it opened and turns into a ring the year it shut down for good.</p>
+    </div>
+    <div class="legend"><span><i class="dot o"></i>Operating</span><span><i class="dot c"></i>Closed</span></div>
+  </header>
+  <div class="legend types" id="typeLegend">
+    <span><i class="shp circ t-pulp"></i>Pulp</span><span><i class="shp circ t-paper"></i>Paper</span>
+    <span><i class="shp sq t-sawmill"></i>Sawmill</span><span><i class="shp tri t-plywood"></i>Plywood</span>
+    <span><i class="shp dia t-osb"></i>OSB</span><span><i class="shp star t-mdf"></i>MDF/particleboard</span>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="mapbox" id="mapbox">
+        <div class="year" id="bigYear" aria-hidden="true">1860</div>
+        <svg id="map" viewBox="0 0 960 600" role="img" aria-label="Map of US wood-products mills for the selected year. Scroll or pinch to zoom, drag to pan, click a mill for details."></svg>
+        <div class="zoomBtns">
+          <button id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+          <button id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out">&minus;</button>
+          <button id="zoomReset" type="button" aria-label="Reset zoom" title="Reset zoom">&#8634;</button>
+        </div>
+        <div class="tip" id="tip" role="status"></div>
+      </div>
+      <p class="hint">Scroll or pinch to zoom, drag to pan. Click a mill to pin its details; click elsewhere or press Escape to close.</p>
+      <p class="warn" id="mapWarn" hidden>The state outlines couldn't load, so mills are plotted on a blank projection. Run <code>python fetch_assets.py</code> to store them locally.</p>
+      <div class="controls">
+        <button class="play" id="play" aria-label="Play animation">Play</button>
+        <input type="range" id="slider" min="1860" max="2026" step="1" value="1860" aria-label="Year">
+        <label>Speed
+          <select id="speed"><option value="3">Slow</option><option value="7" selected>Normal</option><option value="14">Fast</option></select>
+        </label>
+        <label>Show
+          <select id="filter"><option value="all">All mills</option><option value="closed">Only mills that closed</option></select>
+        </label>
+        <label>Type
+          <select id="typeFilter"><option value="all">All types</option></select>
+        </label>
+        <label class="filebtn">Load your own CSV<input type="file" id="csv" accept=".csv,text/csv"></label>
+        <button type="button" id="download">Download subset (CSV)</button>
+      </div>
+    </div>
+
+    <aside aria-live="polite">
+      <div class="counts">
+        <div class="o"><strong id="nOpen">0</strong>Operating</div>
+        <div class="c"><strong id="nClosed">0</strong>Closed</div>
+        <div><strong id="nEver">0</strong>Ever opened</div>
+      </div>
+      <svg id="chart" viewBox="0 0 290 130" aria-label="Operating and cumulative closed mills over time"></svg>
+      <h2>Openings and closures</h2>
+      <ol class="log" id="log"></ol>
+    </aside>
+  </div>
+
+  <p class="foot" id="foot">
+    Loaded from <code>data/mills.csv</code>. About 196 mills assembled from public web sources, not an official census: mostly pulp/paper mills plus a smaller sample of sawmills, plywood, OSB and MDF/particleboard mills,
+    with many small, long-closed or under-covered mills missing. Most opening years and older closures are approximate. Per-mill production capacity is public for very
+    few facilities (most published figures are company-wide totals, not single-mill), so <code>capacity</code> is filled in only where a
+    specific figure was reported and is otherwise blank. Edit the CSV or load another one with columns
+    <code>name, company, city, state, lat, lon, open, close</code> (blank <code>close</code> = operating; optional <code>type, capacity, capacity_unit, checked, note</code>).
+  </p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
