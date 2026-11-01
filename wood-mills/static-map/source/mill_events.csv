@@ -1,0 +1,292 @@
+mill_id,name,event_type,event_year,detail,source
+AK-ketchikan,Ketchikan,opened,1954,,csv:open
+AK-ketchikan,Ketchikan,closed,1997,,csv:close
+AK-sitka,Sitka,opened,1959,,csv:open
+AK-sitka,Sitka,closed,1993,,csv:close
+AL-axis-sawmill,Axis Sawmill,opened,2024,,csv:open
+AL-brewton,Brewton,opened,1957,,csv:open
+AL-chapman-plywood-coastal,Chapman Plywood (Coastal),opened,1980,,csv:open
+AL-coosa-pines,Coosa Pines,opened,1950,,csv:open
+AL-courtland,Courtland,opened,1971,,csv:open
+AL-courtland,Courtland,closed,2014,,csv:close
+AL-demopolis,Demopolis,opened,1957,,csv:open
+AL-eastaboga-particleboard,Eastaboga Particleboard,opened,2019,,csv:open
+AL-fulton-sawmill,Fulton sawmill,opened,1970,,csv:open
+AL-huguley-osb,Huguley OSB,opened,2017,Year uncertain per note.,csv:open
+AL-huguley-osb,Huguley OSB,restarted,2017,Restarted by West Fraser.,csv:note (manual curation)
+AL-jackson,Jackson,opened,1965,,csv:open
+AL-jasper-sawmill,Jasper sawmill,opened,1970,,csv:open
+AL-mahrt,Mahrt,opened,1967,,csv:open
+AL-millport-sawmill,Millport Sawmill,opened,1973,,csv:open
+AL-mobile,Mobile,opened,1928,,csv:open
+AL-mobile,Mobile,closed,2001,,csv:close
+AL-pine-hill,Pine Hill,opened,1968,,csv:open
+AL-prattville,Prattville,opened,1967,,csv:open
+AL-riverdale,Riverdale,opened,1966,,csv:open
+AL-thomasville-osb,Thomasville OSB,opened,2007,,csv:open
+AL-westervelt-gulf-states-paper,Westervelt (Gulf States Paper),opened,1929,Year uncertain per note.,csv:open
+AL-westervelt-gulf-states-paper,Westervelt (Gulf States Paper),closed,1975,Year estimated.,csv:close
+AR-ashdown,Ashdown,opened,1968,,csv:open
+AR-camden,Camden,opened,1927,,csv:open
+AR-camden,Camden,closed,2000,,csv:close
+AR-crossett,Crossett,opened,1937,,csv:open
+AR-crossett,Crossett,line_closed,2019,Bleached board production ended; shift toward tissue/towel.,csv:note (manual curation)
+AR-dierks-sawmill,Dierks Sawmill,opened,1918,,csv:open
+AR-el-dorado-mdf,El Dorado MDF,opened,1998,,csv:open
+AR-fordyce-osb,Fordyce OSB,opened,2000,,csv:open
+AR-glenwood-sawmill,Glenwood sawmill,opened,1969,,csv:open
+AR-glenwood-sawmill,Glenwood sawmill,closed,2025,,csv:close
+AR-gurdon-plywood,Gurdon Plywood,opened,1979,,csv:open
+AR-malvern-mdf,Malvern MDF,opened,1986,Year uncertain per note.,csv:open
+AR-morrilton,Morrilton,opened,1966,,csv:open
+AR-morrilton-expansion,Morrilton expansion,opened,1966,,csv:open
+AR-ola-sawmill,Ola Sawmill,opened,1971,,csv:open
+AR-pine-bluff,Pine Bluff,opened,1958,,csv:open
+AR-waldo-sawmill,Waldo Sawmill,opened,1974,,csv:open
+AR-warren-sawmill,Warren Sawmill,opened,1994,,csv:open
+AZ-snowflake,Snowflake,opened,1961,,csv:open
+AZ-snowflake,Snowflake,closed,2012,,csv:close
+BC-100-mile-house-sawmill,100 Mile House sawmill,opened,1970,,csv:open
+BC-100-mile-house-sawmill,100 Mile House sawmill,closed,2025,,csv:close
+CA-arcata-sawmill,Arcata Sawmill,opened,1951,,csv:open
+CA-arcata-sawmill,Arcata Sawmill,closed,2016,,csv:close
+CA-los-angeles-paper-box-board-mill,Los Angeles Paper Box & Board Mill,opened,1901,,csv:open
+CA-samoa,Samoa,opened,1965,,csv:open
+CA-samoa,Samoa,closed,2013,,csv:close
+CT-simkins-industries-new-haven-pulp-paper,Simkins Industries (New Haven Pulp & Paper),opened,1901,,csv:open
+CT-simkins-industries-new-haven-pulp-paper,Simkins Industries (New Haven Pulp & Paper),closed,2006,,csv:close
+FL-atlas-paper-mills,Atlas Paper Mills,opened,1982,Year uncertain per note.,csv:open
+FL-fernandina-beach-containerboard,Fernandina Beach (containerboard),opened,1937,,csv:open
+FL-fernandina-beach-rayonier,Fernandina Beach (Rayonier),opened,1939,,csv:open
+FL-foley,Foley,opened,1954,,csv:open
+FL-foley,Foley,closed,2023,,csv:close
+FL-havana-plywood-coastal,Havana Plywood (Coastal),opened,1980,,csv:open
+FL-hosford-osb,Hosford OSB,opened,2005,,csv:open
+FL-palatka,Palatka,opened,1947,,csv:open
+FL-panama-city,Panama City,opened,1931,,csv:open
+FL-panama-city,Panama City,closed,2023,,csv:close
+FL-pensacola,Pensacola,opened,1941,,csv:open
+FL-pensacola,Pensacola,line_closed,2023,One fluff pulp machine permanently shut.,csv:note (manual curation)
+FL-port-st-joe,Port St. Joe,opened,1938,,csv:open
+FL-port-st-joe,Port St. Joe,closed,1998,,csv:close
+FL-roses-southeast-papers,Roses SouthEast Papers,opened,2005,,csv:open
+GA-adel-particleboard,Adel Particleboard,opened,1968,,csv:open
+GA-adel-particleboard,Adel Particleboard,closed,2014,,csv:close
+GA-augusta,Augusta,opened,1960,,csv:open
+GA-augusta-sawmill,Augusta sawmill,opened,1975,,csv:open
+GA-augusta-sawmill,Augusta sawmill,closed,2025,,csv:close
+GA-brunswick,Brunswick,opened,1938,,csv:open
+GA-caraustar-austell,Caraustar Austell,opened,1947,,csv:open
+GA-cedar-springs,Cedar Springs,opened,1963,,csv:open
+GA-cedar-springs,Cedar Springs,closed,2025,,csv:close
+GA-flint-river,Flint River,opened,1980,,csv:open
+GA-jesup,Jesup,opened,1954,,csv:open
+GA-macon,Macon,opened,1948,,csv:open
+GA-meldrim-sawmill,Meldrim sawmill,opened,1998,,csv:open
+GA-port-wentworth,Port Wentworth,opened,1951,,csv:open
+GA-riceboro,Riceboro,opened,1968,,csv:open
+GA-riceboro,Riceboro,closed,2025,,csv:close
+GA-rome,Rome,opened,1954,,csv:open
+GA-savannah,Savannah,opened,1936,,csv:open
+GA-savannah,Savannah,closed,2025,,csv:close
+GA-st-marys,St. Marys,opened,1941,,csv:open
+GA-st-marys,St. Marys,closed,1999,,csv:close
+GA-valdosta,Valdosta,opened,1954,,csv:open
+IA-tama,Tama,opened,1878,,csv:open
+IA-tama,Tama,closed,2023,,csv:close
+ID-laclede-sawmill,Laclede Sawmill,opened,1976,,csv:open
+ID-lewiston,Lewiston,opened,1950,,csv:open
+KS-hutchinson,Hutchinson,opened,1909,,csv:open
+KS-hutchinson,Hutchinson,closed,2023,,csv:close
+KY-hawesville,Hawesville,opened,1969,,csv:open
+KY-wickliffe,Wickliffe,opened,1970,,csv:open
+KY-wickliffe,Wickliffe,closed,2019,,csv:close
+LA-bastrop,Bastrop,opened,1920,,csv:open
+LA-bastrop,Bastrop,closed,2008,,csv:close
+LA-bogalusa,Bogalusa,opened,1918,,csv:open
+LA-deridder,DeRidder,opened,1969,,csv:open
+LA-dodson-sawmill,Dodson sawmill,opened,1968,,csv:open
+LA-florien-plywood,Florien Plywood,opened,1965,,csv:open
+LA-mansfield,Mansfield,opened,1981,,csv:open
+LA-oakdale-plywood,Oakdale Plywood,opened,1965,,csv:open
+LA-port-hudson,Port Hudson,opened,1968,,csv:open
+LA-red-river,Red River,opened,1969,,csv:open
+LA-red-river,Red River,closed,2025,,csv:close
+LA-west-monroe,West Monroe,opened,1929,,csv:open
+MD-luke,Luke,opened,1888,,csv:open
+MD-luke,Luke,closed,2019,,csv:close
+ME-androscoggin,Androscoggin,opened,1965,,csv:open
+ME-androscoggin,Androscoggin,closed,2023,,csv:close
+ME-bucksport,Bucksport,opened,1930,,csv:open
+ME-bucksport,Bucksport,closed,2014,,csv:close
+ME-east-millinocket,East Millinocket,opened,1907,,csv:open
+ME-east-millinocket,East Millinocket,closed,2014,,csv:close
+ME-easton-osb,Easton OSB,opened,1983,,csv:open
+ME-lincoln,Lincoln,opened,1882,,csv:open
+ME-lincoln,Lincoln,closed,2015,,csv:close
+ME-madison,Madison,opened,1978,,csv:open
+ME-madison,Madison,closed,2016,,csv:close
+ME-millinocket,Millinocket,opened,1900,,csv:open
+ME-millinocket,Millinocket,closed,2008,,csv:close
+ME-old-town,Old Town,idled,2015,Shuttered by Expera (restarted 2019 by ND Paper).,csv:note (manual curation)
+ME-old-town,Old Town,opened,2019,,csv:open
+ME-old-town,Old Town,closed,2023,,csv:close
+ME-old-town,Old Town,idled,2023,Idled indefinitely April 2023.,csv:note (manual curation)
+ME-rumford,Rumford,opened,1901,,csv:open
+ME-somerset,Somerset,opened,1976,,csv:open
+ME-winslow,Winslow,opened,1892,,csv:open
+ME-winslow,Winslow,closed,1997,,csv:close
+ME-woodland,Woodland,opened,1906,,csv:open
+MI-cheboygan,Cheboygan,opened,1993,,csv:open
+MI-cheboygan,Cheboygan,closed,2023,,csv:close
+MI-escanaba,Escanaba,opened,1911,,csv:open
+MI-grayling-particleboard,Grayling Particleboard,opened,2018,,csv:open
+MI-muskegon,Muskegon,opened,1899,,csv:open
+MI-muskegon,Muskegon,closed,2009,,csv:close
+MI-quinnesec,Quinnesec,opened,1985,,csv:open
+MI-sagola-osb,Sagola OSB,opened,1988,,csv:open
+MN-cloquet,Cloquet,opened,1898,,csv:open
+MN-cohasset-osb,Cohasset OSB,opened,2025,Year uncertain per note.,csv:open
+MN-grand-rapids,Grand Rapids,opened,1902,,csv:open
+MN-sartell,Sartell,opened,1905,,csv:open
+MN-sartell,Sartell,closed,2012,,csv:close
+MS-ackerman-sawmill,Ackerman sawmill,opened,1968,,csv:open
+MS-beaumont-plywood,Beaumont Plywood,opened,2025,,csv:open
+MS-beaumont-plywood,Beaumont Plywood,startup_targeted,2025,Targeted early 2025.,csv:note (manual curation)
+MS-columbus,Columbus,opened,1967,,csv:open
+MS-hermanville-sawmill,Hermanville Sawmill,opened,1983,,csv:open
+MS-leaf-river,Leaf River,opened,1984,,csv:open
+MS-moss-point,Moss Point,opened,1913,,csv:open
+MS-moss-point,Moss Point,closed,2001,,csv:close
+MS-natchez,Natchez,opened,1950,,csv:open
+MS-natchez,Natchez,closed,2003,,csv:close
+MS-taylorsville-plywood,Taylorsville Plywood,opened,1963,Year uncertain per note.,csv:open
+MS-vicksburg,Vicksburg,opened,1967,,csv:open
+MS-wiggins-plywood,Wiggins Plywood,opened,1971,,csv:open
+MS-wiggins-plywood,Wiggins Plywood,closed,2026,,csv:close
+MS-wiggins-plywood,Wiggins Plywood,closure_announced,2026,Closure announced after Tropical Storm Arthur damage.,csv:note (manual curation)
+MT-frenchtown,Frenchtown,opened,1957,,csv:open
+MT-frenchtown,Frenchtown,closed,2010,,csv:close
+MT-kalispell-plywood,Kalispell Plywood,opened,1978,,csv:open
+NC-canton,Canton,opened,1908,,csv:open
+NC-canton,Canton,closed,2023,,csv:close
+NC-moncure-mdf,Moncure MDF,opened,2010,,csv:open
+NC-moncure-mdf,Moncure MDF,line_closed,2020,Co-located particleboard line closed April 2020.,csv:note (manual curation)
+NC-new-bern,New Bern,opened,1969,,csv:open
+NC-plymouth,Plymouth,opened,1937,,csv:open
+NC-riegelwood,Riegelwood,opened,1951,,csv:open
+NC-riegelwood,Riegelwood,line_closed,2023,One pulp machine permanently shut (end of year).,csv:note (manual curation)
+NC-roanoke-rapids,Roanoke Rapids,opened,1907,,csv:open
+NH-berlin,Berlin,opened,1892,,csv:open
+NH-berlin,Berlin,closed,2006,,csv:close
+NH-groveton,Groveton,opened,1891,,csv:open
+NH-groveton,Groveton,closed,2007,,csv:close
+NY-corinth,Corinth,opened,1869,,csv:open
+NY-corinth,Corinth,closed,2002,,csv:close
+NY-south-glens-falls,South Glens Falls,opened,1883,,csv:open
+NY-south-glens-falls,South Glens Falls,closed,2023,,csv:close
+NY-ticonderoga,Ticonderoga,opened,1970,,csv:open
+OH-chillicothe,Chillicothe,opened,1920,,csv:open
+OH-chillicothe,Chillicothe,closed,2025,,csv:close
+OK-broken-bow-osb,Broken Bow OSB,opened,2004,,csv:open
+OR-coquille-plywood,Coquille Plywood,opened,1958,,csv:open
+OR-dillard-mdf,Dillard MDF,opened,2024,,csv:open
+OR-dillard-mdf,Dillard MDF,startup_targeted,2024,Targeted late summer 2024.,csv:note (manual curation)
+OR-dillard-plywood-hardwood-line,Dillard Plywood (hardwood line),opened,1952,,csv:open
+OR-dillard-plywood-hardwood-line,Dillard Plywood (hardwood line),closed,2025,,csv:close
+OR-dillard-plywood-hardwood-line,Dillard Plywood (hardwood line),line_closed,2025,Hardwood plywood line closed Sept 2025.,csv:note (manual curation)
+OR-eugene-mdf,Eugene MDF,opened,1956,Year uncertain per note.,csv:open
+OR-eugene-mdf,Eugene MDF,closed,2020,,csv:close
+OR-medford-mdf,Medford MDF,opened,1975,Year uncertain per note.,csv:open
+OR-oregon-city,Oregon City,opened,1908,,csv:open
+OR-oregon-city,Oregon City,closed,2011,,csv:close
+OR-saint-helens,Saint Helens,opened,1927,,csv:open
+OR-saint-helens,Saint Helens,closed,2023,,csv:close
+OR-springfield,Springfield,opened,1949,,csv:open
+OR-toledo,Toledo,opened,1957,,csv:open
+OR-wauna,Wauna,opened,1965,,csv:open
+PA-erie,Erie,opened,1898,,csv:open
+PA-erie,Erie,closed,2002,,csv:close
+PA-johnsonburg,Johnsonburg,opened,1889,,csv:open
+PA-lock-haven,Lock Haven,opened,1880,,csv:open
+PA-lock-haven,Lock Haven,closed,2001,,csv:close
+PA-spring-grove,Spring Grove,opened,1864,,csv:open
+SC-allendale-osb,Allendale OSB,opened,2007,,csv:open
+SC-barnwell,Barnwell,opened,2016,,csv:open
+SC-barnwell,Barnwell,closed,2023,,csv:close
+SC-barnwell,Barnwell,reopened,2025,Reacquired and reopened by ST Group as Barnwell Tissue Solutions.,csv:note (manual curation)
+SC-camden-sawmill,Camden Sawmill,opened,1983,,csv:open
+SC-catawba,Catawba,opened,1959,,csv:open
+SC-chester-plywood,Chester Plywood,opened,1982,Year uncertain per note.,csv:open
+SC-conway-sawmill,Conway Sawmill,opened,1957,,csv:open
+SC-darlington-sawmill,Darlington sawmill,opened,1979,,csv:open
+SC-darlington-sawmill,Darlington sawmill,closed,2025,,csv:close
+SC-eastover,Eastover,opened,1984,,csv:open
+SC-estill-sawmill,Estill sawmill,opened,1974,,csv:open
+SC-estill-sawmill,Estill sawmill,closed,2025,,csv:close
+SC-florence,Florence,opened,1963,,csv:open
+SC-georgetown,Georgetown,opened,1937,,csv:open
+SC-georgetown,Georgetown,closed,2024,,csv:close
+SC-north-charleston,North Charleston,opened,1937,,csv:open
+SC-north-charleston,North Charleston,closed,2023,,csv:close
+SC-prosperity-plywood,Prosperity Plywood,opened,1975,,csv:open
+TN-calhoun,Calhoun,opened,1954,,csv:open
+TN-counce,Counce,opened,1957,,csv:open
+TN-kingsport,Kingsport,opened,1916,,csv:open
+TN-spring-city-osb,Spring City OSB,opened,1997,,csv:open
+TN-spring-city-osb,Spring City OSB,idled,2011,Idled amid housing downturn.,csv:note (manual curation)
+TN-spring-city-osb,Spring City OSB,restarted,2018,Production restarted April 2018.,csv:note (manual curation)
+TX-angelina-sawmill,Angelina sawmill,opened,2018,,csv:open
+TX-henderson-sawmill,Henderson sawmill,opened,1998,,csv:open
+TX-jefferson-osb,Jefferson OSB,opened,2013,Year uncertain per note.,csv:open
+TX-jefferson-osb,Jefferson OSB,restarted,2013,Restarted by West Fraser.,csv:note (manual curation)
+TX-lufkin,Lufkin,opened,1940,,csv:open
+TX-lufkin,Lufkin,closed,2003,,csv:close
+TX-orange,Orange,opened,1967,,csv:open
+TX-orange,Orange,closed,2023,,csv:close
+TX-waco-recycled-paper-mill,Waco recycled paper mill,opened,2025,,csv:open
+TX-waco-recycled-paper-mill,Waco recycled paper mill,startup_targeted,2025,Targeted Q4 2025.,csv:note (manual curation)
+VA-covington,Covington,opened,1899,,csv:open
+VA-crystal-hill-osb,Crystal Hill OSB,opened,1995,,csv:open
+VA-emporia-plywood,Emporia Plywood,opened,1966,,csv:open
+VA-emporia-plywood,Emporia Plywood,closed,2025,,csv:close
+VA-franklin,Franklin,opened,1937,,csv:open
+VA-franklin,Franklin,line_closed,2010,Paper making ended; fluff pulp continues.,csv:note (manual curation)
+VA-west-point,West Point,opened,1914,,csv:open
+VT-putney,Putney,opened,1869,,csv:open
+VT-putney,Putney,closed,2024,,csv:close
+WA-bellingham,Bellingham,opened,1926,,csv:open
+WA-bellingham,Bellingham,closed,2001,,csv:close
+WA-camas,Camas,opened,1885,,csv:open
+WA-camas,Camas,closed,2018,,csv:close
+WA-camas,Camas,line_closed,2018,Pulping ended; reduced paper operation remained.,csv:note (manual curation)
+WA-camas-panel-paper-complex,Camas panel/paper complex,opened,1885,,csv:open
+WA-camas-panel-paper-complex,Camas panel/paper complex,closed,2018,,csv:close
+WA-cosmopolis,Cosmopolis,opened,1957,,csv:open
+WA-cosmopolis,Cosmopolis,closed,2022,,csv:close
+WA-everett,Everett,opened,1931,,csv:open
+WA-everett,Everett,closed,2012,,csv:close
+WA-longview-nippon-dynawave,Longview (Nippon Dynawave),opened,1931,,csv:open
+WA-longview-nippon-dynawave,Longview (Nippon Dynawave),idled,2026,Largely shut after May 2026 white-liquor tank collapse.,csv:note (manual curation)
+WA-longview-norpac,Longview (NORPAC),opened,1979,,csv:open
+WA-port-angeles,Port Angeles,opened,1930,,csv:open
+WA-port-angeles,Port Angeles,closed,1997,,csv:close
+WA-port-angeles-nippon-paper,Port Angeles (Nippon Paper),opened,1920,,csv:open
+WA-port-angeles-nippon-paper,Port Angeles (Nippon Paper),closed,2024,,csv:close
+WA-sumner,Sumner,opened,1915,,csv:open
+WA-sumner,Sumner,closed,2024,,csv:close
+WA-tacoma,Tacoma,opened,1929,,csv:open
+WA-tacoma,Tacoma,closed,2023,,csv:close
+WA-usk,Usk,opened,1989,,csv:open
+WA-usk,Usk,closed,2020,,csv:close
+WA-wallula,Wallula,opened,1959,,csv:open
+WI-kaukauna,Kaukauna,opened,1883,,csv:open
+WI-kimberly,Kimberly,opened,1889,,csv:open
+WI-kimberly,Kimberly,closed,2008,,csv:close
+WI-mosinee,Mosinee,opened,1910,,csv:open
+WI-nekoosa,Nekoosa,opened,1893,,csv:open
+WI-port-edwards,Port Edwards,opened,1896,,csv:open
+WI-port-edwards,Port Edwards,closed,2008,,csv:close
+WI-wisconsin-rapids,Wisconsin Rapids,opened,1904,,csv:open
+WI-wisconsin-rapids,Wisconsin Rapids,closed,2020,,csv:close
+WV-sutton-osb,Sutton OSB,opened,1997,Year uncertain per note.,csv:open

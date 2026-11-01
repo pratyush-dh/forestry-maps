@@ -1,0 +1,467 @@
+{
+  "map": "US wood mills: a working sample, not a census",
+  "generated": "2026-11-01",
+  "principle": "Colour carries STATUS only (2 validated hues + neutral gray); SHAPE carries mill type; fill style repeats colour so colour is never the only cue. Capacity is not mapped.",
+  "crs": {
+    "lonlat_layers": "EPSG:4326 (WGS84)",
+    "projected_layers": {
+      "name": "US_Wood_Mills_Albers_Sphere (custom; see .prj)",
+      "projection": "Albers equal-area conic, spherical",
+      "standard_parallels": [
+        29.5,
+        45.5
+      ],
+      "latitude_of_origin": 37.5,
+      "central_meridian": -96.0,
+      "sphere_radius_m": 6371008.8,
+      "units": "metre",
+      "alaska_inset": {
+        "projection": "Albers",
+        "standard_parallels": [
+          55,
+          65
+        ],
+        "origin": [
+          50,
+          -154
+        ],
+        "scale": 0.35,
+        "lower_left_m": [
+          -2400000.0,
+          -1570000.0
+        ],
+        "box_m": [
+          -2400000.0,
+          -1570000.0,
+          -1510606.7,
+          -855621.2
+        ]
+      },
+      "hawaii_inset": {
+        "projection": "Albers",
+        "standard_parallels": [
+          8,
+          18
+        ],
+        "origin": [
+          3,
+          -157
+        ],
+        "scale": 0.35,
+        "box_m": [
+          -1460606.7,
+          -1570000.0,
+          -1000606.7,
+          -1230000.0
+        ],
+        "records_in_sample": 0,
+        "note": "drawn with a 'No records in this sample' label"
+      },
+      "inset_scale_bar": {
+        "length_km": 1000,
+        "segments": 2,
+        "drawn_length_m": 350000.0,
+        "lower_left_m": [
+          -860606.7,
+          -1495000.0
+        ],
+        "note": "one bar serves both insets; drawn length = km x 0.35"
+      },
+      "scale_distortion": "parallels 0.990-1.015; max +/-1.5% across the lower 48"
+    }
+  },
+  "layout": {
+    "figure_in": [
+      16,
+      10.8
+    ],
+    "export_dpi": 200,
+    "map_extent_m": {
+      "x": [
+        -2450000.0,
+        2450000.0
+      ],
+      "y": [
+        -1800000.0,
+        1650000.0
+      ]
+    },
+    "colocated_display_offset_m": 22000
+  },
+  "palette": {
+    "page": "#F2F3EE",
+    "ocean": "#E1E7E0",
+    "land": "#FBFBF8",
+    "state_border": "#CDD3C8",
+    "graticule": "#B7C2B5",
+    "ink": "#16201A",
+    "ink_secondary": "#44504A",
+    "muted": "#6B756E",
+    "rule": "#C4CBC1",
+    "status_blue": "#2a78d6",
+    "status_orange": "#eb6834",
+    "status_gray": "#52514e",
+    "shape_ink": "#3A463F"
+  },
+  "palette_validation": {
+    "tool": "dataviz validate_palette.js",
+    "colors": [
+      "#2a78d6",
+      "#eb6834"
+    ],
+    "mode": "light",
+    "surface": "#FBFBF8",
+    "pairs": "all",
+    "cvd_worst_dE": 24.7,
+    "tritan_worst_dE": 32.7,
+    "normal_vision_dE": 33.6,
+    "contrast_vs_surface": ">= 3:1",
+    "result": "ALL CHECKS PASS"
+  },
+  "symbol_scaling": {
+    "main_map_area_factor": 0.55,
+    "main_map_outline_factor": 0.72,
+    "enlarged_frames_area_factor": 0.7,
+    "enlarged_frames_outline_factor": 0.82,
+    "note": "size_pt2 in shapes is already scaled for the main map; enlarged frames use the *_enlarged_frames values"
+  },
+  "enlarged_frames": {
+    "purpose": "show areas where symbols overlap on the main map",
+    "extent_indicator": "ink rectangle + letter chip on the main map",
+    "grid_deg": 5,
+    "state_labels": "USPS abbreviations, muted",
+    "scale_bar": "own bar below each frame",
+    "display_nudge": "marks closer than one circle-symbol diameter are pushed apart (max 0.6 x diameter, about 10 km), display only; not applied to any exported coordinates",
+    "frames": [
+      {
+        "tag": "A",
+        "name": "Pacific Northwest",
+        "box_m": [
+          -2400000,
+          620000,
+          -1800000,
+          1580000
+        ],
+        "scale_bar_km": 200
+      },
+      {
+        "tag": "B",
+        "name": "Upper Midwest",
+        "box_m": [
+          100000,
+          660000,
+          800000,
+          1180000
+        ],
+        "scale_bar_km": 150
+      },
+      {
+        "tag": "C",
+        "name": "Gulf South",
+        "box_m": [
+          0,
+          -920000,
+          1015000,
+          -170000
+        ],
+        "scale_bar_km": 250
+      },
+      {
+        "tag": "D",
+        "name": "Southeast",
+        "box_m": [
+          980000,
+          -770000,
+          1770000,
+          200000
+        ],
+        "scale_bar_km": 200
+      },
+      {
+        "tag": "E",
+        "name": "New England",
+        "box_m": [
+          1620000,
+          780000,
+          2320000,
+          1380000
+        ],
+        "scale_bar_km": 150
+      }
+    ]
+  },
+  "status_classes": [
+    {
+      "id": "ring_approx",
+      "label": "Closed, closure year approximate",
+      "derive_from": "operational_status = 'closed' AND status_confidence <> 'verified'",
+      "count": 41,
+      "draw_order": 1,
+      "face": "none",
+      "outline": "#eb6834",
+      "outline_width_pt": 0.936,
+      "outline_width_pt_enlarged_frames": 1.066,
+      "alpha": 0.6,
+      "hatch": null,
+      "outline_style": "solid"
+    },
+    {
+      "id": "ring_verified",
+      "label": "Closed, closure year verified",
+      "derive_from": "operational_status = 'closed' AND status_confidence = 'verified'",
+      "count": 30,
+      "draw_order": 2,
+      "face": "#FBFBF8",
+      "outline": "#eb6834",
+      "outline_width_pt": 1.44,
+      "outline_width_pt_enlarged_frames": 1.64,
+      "alpha": 1.0,
+      "hatch": null,
+      "outline_style": "solid"
+    },
+    {
+      "id": "filled",
+      "label": "No closure recorded (operating status not confirmed)",
+      "derive_from": "operational_status IN ('open','partial','reopened')",
+      "count": 117,
+      "draw_order": 3,
+      "face": "#2a78d6",
+      "outline": "#FBFBF8",
+      "outline_width_pt": 0.648,
+      "outline_width_pt_enlarged_frames": 0.738,
+      "alpha": 0.95,
+      "hatch": null,
+      "outline_style": "solid"
+    },
+    {
+      "id": "hatched",
+      "label": "Idled or largely shut",
+      "derive_from": "operational_status = 'idled'",
+      "count": 2,
+      "draw_order": 4,
+      "face": "#eb6834",
+      "outline": "#FBFBF8",
+      "outline_width_pt": 0.648,
+      "outline_width_pt_enlarged_frames": 0.738,
+      "alpha": 1.0,
+      "hatch": "/////",
+      "outline_style": "solid"
+    },
+    {
+      "id": "dashed",
+      "label": "Status unknown (startup not confirmed)",
+      "derive_from": "operational_status = 'unknown'",
+      "count": 5,
+      "draw_order": 5,
+      "face": "#FBFBF8",
+      "outline": "#52514e",
+      "outline_width_pt": 1.152,
+      "outline_width_pt_enlarged_frames": 1.312,
+      "alpha": 1.0,
+      "hatch": null,
+      "outline_style": "dashed"
+    }
+  ],
+  "shapes": [
+    {
+      "group": "pulp_paper",
+      "label": "Pulp & paper",
+      "matplotlib_marker": "o",
+      "qgis_marker": "circle",
+      "size_pt2": 29.7,
+      "size_pt2_enlarged_frames": 37.8,
+      "size_pt2_unscaled": 54,
+      "size_mm": 1.92,
+      "count": 137,
+      "mill_types": [
+        "pulp",
+        "paper",
+        "other"
+      ]
+    },
+    {
+      "group": "sawmill",
+      "label": "Sawmill",
+      "matplotlib_marker": "s",
+      "qgis_marker": "square",
+      "size_pt2": 26.4,
+      "size_pt2_enlarged_frames": 33.6,
+      "size_pt2_unscaled": 48,
+      "size_mm": 1.81,
+      "count": 22,
+      "mill_types": [
+        "sawmill"
+      ]
+    },
+    {
+      "group": "plywood",
+      "label": "Plywood",
+      "matplotlib_marker": "^",
+      "qgis_marker": "triangle",
+      "size_pt2": 36.3,
+      "size_pt2_enlarged_frames": 46.2,
+      "size_pt2_unscaled": 66,
+      "size_mm": 2.13,
+      "count": 14,
+      "mill_types": [
+        "plywood"
+      ]
+    },
+    {
+      "group": "osb",
+      "label": "OSB",
+      "matplotlib_marker": "D",
+      "qgis_marker": "diamond",
+      "size_pt2": 25.3,
+      "size_pt2_enlarged_frames": 32.2,
+      "size_pt2_unscaled": 46,
+      "size_mm": 1.77,
+      "count": 13,
+      "mill_types": [
+        "osb"
+      ]
+    },
+    {
+      "group": "mdf",
+      "label": "MDF / particleboard",
+      "matplotlib_marker": "*",
+      "qgis_marker": "star",
+      "size_pt2": 64.9,
+      "size_pt2_enlarged_frames": 82.6,
+      "size_pt2_unscaled": 118,
+      "size_mm": 2.84,
+      "count": 9,
+      "mill_types": [
+        "mdf"
+      ]
+    }
+  ],
+  "layers": {
+    "graticule": {
+      "interval_deg": 10,
+      "colour": "#B7C2B5",
+      "width_pt": 0.8,
+      "drawn": "under the land polygons (z 0.6 < 1)",
+      "labels": "Inter 8.2 pt, muted; parallels on the Atlantic edge, meridians on the top edge"
+    },
+    "land": {
+      "fill": "#FBFBF8",
+      "border": "#CDD3C8",
+      "border_width_pt": 0.7
+    },
+    "ocean": {
+      "fill": "#E1E7E0"
+    },
+    "frame": {
+      "colour": "#16201A",
+      "width_pt": 1.1,
+      "note": "bounding box of the main map"
+    },
+    "inset_box": {
+      "colour": "#16201A",
+      "width_pt": 0.9,
+      "fill": "#E1E7E0",
+      "applies_to": [
+        "Alaska",
+        "Hawaii"
+      ]
+    },
+    "scale_bar": {
+      "length_km": 1000,
+      "segments": 4,
+      "colours": [
+        "#16201A",
+        "#FBFBF8"
+      ],
+      "also_in_miles": "621 mi",
+      "note": "Lower 48 only; equal-area, scale varies +/-1.5%"
+    }
+  },
+  "typography": [
+    {
+      "role": "Title",
+      "family": "Caladea",
+      "weight": "Bold",
+      "size_pt": 46,
+      "colour": "#16201A",
+      "align": "centre"
+    },
+    {
+      "role": "Deck",
+      "family": "Inter",
+      "weight": "SemiBold",
+      "size_pt": 9.4,
+      "colour": "#6B756E",
+      "note": "UPPERCASE, faux-tracked"
+    },
+    {
+      "role": "Headline sentence",
+      "family": "Caladea",
+      "weight": "Regular",
+      "size_pt": 17.5,
+      "colour": "#16201A",
+      "line_height": 1.2
+    },
+    {
+      "role": "Section label",
+      "family": "Inter",
+      "weight": "SemiBold",
+      "size_pt": 8.4,
+      "colour": "#6B756E",
+      "note": "UPPERCASE, faux-tracked"
+    },
+    {
+      "role": "Legend label",
+      "family": "Inter",
+      "weight": "Regular",
+      "size_pt": 11.5,
+      "colour": "#16201A"
+    },
+    {
+      "role": "Legend count",
+      "family": "Inter",
+      "weight": "Medium",
+      "size_pt": 11.5,
+      "colour": "#44504A",
+      "align": "right"
+    },
+    {
+      "role": "Legend sub-label",
+      "family": "Inter",
+      "weight": "Regular",
+      "size_pt": 9.3,
+      "colour": "#6B756E"
+    },
+    {
+      "role": "Caveat lead-in",
+      "family": "Inter",
+      "weight": "SemiBold",
+      "size_pt": 10.6,
+      "colour": "#16201A"
+    },
+    {
+      "role": "Caveat body",
+      "family": "Inter",
+      "weight": "Regular",
+      "size_pt": 9.7,
+      "colour": "#44504A",
+      "line_height": 1.4
+    },
+    {
+      "role": "Map labels (graticule, scale bar, inset)",
+      "family": "Inter",
+      "weight": "Regular",
+      "size_pt": "7.9-8.4",
+      "colour": "#6B756E"
+    },
+    {
+      "role": "Footer",
+      "family": "Inter",
+      "weight": "Regular",
+      "size_pt": 8.0,
+      "colour": "#6B756E",
+      "line_height": 1.55
+    }
+  ],
+  "status_derivation_note": "status_class derives from the pipeline fields operational_status and status_confidence; see source/qa_report.md. 'checked=1' verifies the CLOSURE YEAR only."
+}
