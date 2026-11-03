@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nearest mill, mapped</title>
+<meta name="description" content="Voronoi catchments of 116 open U.S. wood-mill sites, coloured by the FIA forest removals inside each polygon.">
+<style>
+:root { --bg:#ffffff; --ink:#1c1c1c; --mut:#4a4a4a; --line:#dcdcdc; --acc:#c2331f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#111; --ink:#eee; --mut:#b4b4b4; --line:#333; --acc:#ff8a73; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.55 Candara, "Segoe UI", system-ui, sans-serif; }
+main { max-width:1200px; margin:0 auto; padding:24px 16px 48px; }
+.kicker { color:var(--acc); font-weight:700; letter-spacing:.04em; text-transform:uppercase; font-size:.85rem; margin:0 0 6px; }
+h1 { font-size:clamp(1.7rem, 4.5vw, 2.8rem); line-height:1.15; margin:0 0 10px; }
+.dek { color:var(--mut); max-width:62ch; margin:0 0 18px; }
+.links { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 20px; padding:0; list-style:none; }
+.links a { display:inline-block; padding:8px 14px; border:1px solid var(--ink); border-radius:6px; color:var(--ink); text-decoration:none; font-weight:600; }
+.links a:hover { background:var(--ink); color:var(--bg); }
+.map { display:block; width:100%; height:auto; border:1px solid var(--line); background:#fff; }
+.note { color:var(--mut); font-size:.95rem; max-width:80ch; margin-top:18px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker">Forest products &middot; polygons</p>
+  <h1>Nearest mill, mapped: Voronoi catchments of U.S. wood mills</h1>
+  <p class="dek">Each polygon is the area closer to one open wood-mill site than to any other, coloured by the forest wood removed inside it. A model, not a traffic count, and the mill list is a sample.</p>
+  <ul class="links">
+    <li><a href="static-map/voronoi_mill_catchments.pdf">Vector PDF, 36 x 25 in</a></li>
+    <li><a href="static-map/voronoi_mill_catchments.png">PNG, 4500 x 3125 px</a></li>
+    <li><a href="data/voronoi_cells.gpkg">Polygons (GeoPackage)</a></li>
+    <li><a href="data/voronoi_cell_stats.csv">Statistics (CSV)</a></li>
+    <li><a href="README.md">Method and caveats</a></li>
+  </ul>
+  <a href="static-map/voronoi_mill_catchments.png"><img class="map" src="static-map/voronoi_mill_catchments.png" alt="Map of the lower 48 states divided into 116 Voronoi polygons, one per wood-mill site, shaded from light to dark green by the wood removed per square kilometre. The Southeast has many small dark polygons, and the West a few very large pale ones."></a>
+  <p class="note">Trucks follow roads, so a mill's real catchment differs from its polygon; the <a href="../forest-to-mill/">forest-to-mill web map</a> shows road time. Open the PDF for the full-size, printable version with every note and chart.</p>
+</main>
+</body>
+</html>
