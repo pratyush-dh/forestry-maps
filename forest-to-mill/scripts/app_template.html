@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Forest to mill</title>
+<meta name="description" content="Modelled wood-haul traffic from FIA forest removals to 117 mills across 13 southern states.">
+<style>
+:root{
+  --ink:#111;--mut:#6a6a6a;--rule:#dcdcdc;--bg:#fff;--acc:#d9531e;--map:#000;
+  --gut:clamp(14px,4vw,36px);--maph:44svh;
+  --font:Candara,Optima,"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 clamp(15px,1.1vw + 12px,16.5px)/1.5 var(--font);padding-bottom:env(safe-area-inset-bottom)}
+button{font-family:inherit}
+.wrap{max-width:1700px;margin:0 auto;padding:0 var(--gut)}
+.top{padding:clamp(14px,3vw,28px) 0 clamp(10px,2vw,18px)}
+.kicker{margin:0 0 .35em;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);font-weight:700}
+h1{margin:0;font:700 clamp(2rem,7vw,3.6rem)/1 var(--font);letter-spacing:-.01em}
+.dek{margin:.5em 0 0;max-width:48em;color:var(--mut);font-size:clamp(.98rem,2.2vw,1.12rem)}
+/* ---- shell: phone = map pinned on top, panels scroll beneath ---- */
+.app{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"map" "left" "right";gap:0}
+.mapcol{grid-area:map;position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0}
+.mapwrap{position:relative;background:var(--map);width:100%;height:var(--maph);min-height:220px;overflow:hidden;touch-action:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+canvas:active{cursor:grabbing}
+.zoom{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:42px;height:42px;border:1px solid #555;background:rgba(0,0,0,.72);color:#fff;font:600 21px/1 var(--font);cursor:pointer}
+.zoom button:active{background:#222}
+.chip{position:absolute;left:8px;bottom:44px;right:64px;display:none;background:rgba(0,0,0,.86);border:1px solid #484848;color:#fff;padding:7px 10px;font-size:.88rem;line-height:1.3;max-width:420px}
+.chip.on{display:flex;gap:10px;align-items:flex-start}
+.chip b{display:block}.chip small{color:#bbb}
+.chip button{margin-left:auto;background:none;border:0;color:#fff;font-size:22px;line-height:1;padding:0 4px;cursor:pointer}
+.hint{position:absolute;left:8px;top:8px;color:#a0a0a0;font-size:.74rem;pointer-events:none}
+.ptog{display:none;position:absolute;left:8px;top:8px;gap:6px}
+.ptog button{background:rgba(0,0,0,.72);border:1px solid #555;color:#fff;font:600 .8rem var(--font);padding:7px 11px;cursor:pointer}
+.ptog button[aria-pressed=false]{color:#999}
+/* side panels */
+.side{min-width:0;padding:0 0 28px}
+#left{grid-area:left;padding-top:6px}
+#right{grid-area:right}
+section.blk{padding:16px 0 18px;border-top:1px solid var(--ink)}
+section.blk:first-child{border-top:0}
+h2{margin:0 0 .6em;font:700 .76rem var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.layers{display:flex;flex-wrap:wrap;gap:8px}
+.layers button{border:1px solid var(--ink);background:#fff;color:var(--ink);font:600 .84rem var(--font);padding:8px 13px;border-radius:999px;cursor:pointer;min-height:38px}
+.layers button[aria-pressed=true]{background:var(--ink);color:#fff}
+.ctl{margin:0 0 14px}
+.ctl label{display:flex;justify-content:space-between;gap:12px;font-weight:700}
+.ctl output{font-variant-numeric:tabular-nums;color:var(--acc)}
+.ctl small{display:block;color:var(--mut);margin-top:2px;font-size:.82rem;line-height:1.35}
+input[type=range]{width:100%;height:34px;margin:2px 0;accent-color:var(--acc)}
+.legend{display:grid;gap:7px;font-size:.85rem;color:var(--mut)}
+.legend span{display:flex;gap:10px;align-items:center}
+.legend i.l{display:inline-block;background:var(--acc);width:30px}
+.lk{display:inline-block;background:#000;color:#ddd;padding:3px 9px;min-width:104px;font-size:.82rem;line-height:1.2}
+.figs{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 16px}
+.fig b{display:block;font:700 clamp(1.7rem,6vw,2.3rem)/1 var(--font);color:var(--acc);font-variant-numeric:tabular-nums}
+.fig span{display:block;font-size:.82rem;color:var(--mut);margin-top:.25em;line-height:1.3}
+#sel .nm{font:700 1.2rem/1.2 var(--font)}
+#sel table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9rem}
+#sel td{padding:5px 0;border-bottom:1px solid var(--rule)}#sel td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.muted{color:var(--mut)}
+.btn{border:1px solid var(--ink);background:#fff;color:var(--ink);font:600 .82rem var(--font);padding:6px 12px;border-radius:999px;cursor:pointer}
+.btn:hover{background:var(--ink);color:#fff}
+figure{margin:0 0 24px}
+figcaption{margin-bottom:6px}
+figcaption b{display:block;font-size:.98rem}
+figcaption span{display:block;color:var(--mut);font-size:.82rem;line-height:1.3}
+.minis{display:flex;gap:6px;margin-top:6px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--font)}
+[data-act]{cursor:pointer}
+[data-act]:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+details{border-top:1px solid var(--rule);padding:11px 0}
+details:last-of-type{border-bottom:1px solid var(--rule)}
+summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:26px}
+summary::after{content:"+";font-size:1.3rem;color:var(--mut)}details[open] summary::after{content:"–"}
+details p{margin:.55em 0 0;color:#333;font-size:.92rem}
+footer{padding:18px 0 36px;border-top:1px solid var(--ink);font-size:.8rem;color:var(--mut);line-height:1.5}
+/* ---- tablet: map left (pinned), both panels in one side column ---- */
+@media(min-width:700px){
+  :root{--maph:62svh}
+  .app{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:"map left" "map right";column-gap:26px;grid-template-rows:auto 1fr}
+  .mapcol{top:12px;align-self:start;padding:0}
+  .mapwrap{height:calc(100svh - 24px)}
+  .figs{grid-template-columns:repeat(2,1fr)}
+  #msize{display:none}
+}
+/* ---- desktop: left panel | map | right panel, each scrolls on its own ---- */
+@media(min-width:1100px){
+  .app{--lw:270px;--rw:380px;grid-template-columns:var(--lw) minmax(0,1fr) var(--rw);grid-template-areas:"left map right";column-gap:0;grid-template-rows:auto}
+  .app.hl{--lw:0px}.app.hr{--rw:0px}
+  .side{position:sticky;top:12px;max-height:calc(100svh - 24px);overflow:auto;padding:0 18px 20px;scrollbar-width:thin}
+  #left{padding-left:0}#right{padding-right:0}
+  .app.hl #left,.app.hr #right{visibility:hidden;padding:0;overflow:hidden}
+  .mapcol{top:12px;padding:0}
+  .mapwrap{height:calc(100svh - 24px)}
+  .ptog{display:flex}
+  .hint{display:none}
+}
+.pop{position:fixed;left:0;right:0;bottom:0;max-height:52svh;background:#fff;border-top:2px solid var(--ink);z-index:60;display:flex;flex-direction:column;touch-action:pan-y;padding-bottom:env(safe-area-inset-bottom)}
+.pop[hidden]{display:none}
+.pop header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--rule)}
+.pop .tabs{display:flex;gap:6px}
+.pop .tabs button{border:1px solid var(--ink);background:#fff;color:var(--ink);font:600 .8rem var(--font);padding:5px 12px;border-radius:999px;cursor:pointer}
+.pop .tabs button[aria-pressed=true]{background:var(--ink);color:#fff}
+.pop .x{margin-left:auto;background:none;border:0;font-size:24px;line-height:1;cursor:pointer;padding:2px 8px;color:var(--ink)}
+.popb{overflow:auto;padding:12px 14px 18px;overscroll-behavior:contain}
+@media(min-width:700px){.pop{position:absolute;left:8px;top:54px;bottom:auto;right:auto;width:min(340px,calc(100% - 16px));max-height:calc(100% - 66px);border:1px solid var(--ink)}}
+.exp{float:right;margin:0 0 4px 10px;border:1px solid var(--ink);background:#fff;color:var(--ink);font:600 .74rem var(--font);padding:3px 10px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.exp:hover{background:var(--ink);color:#fff}
+figcaption[data-act=expand]{cursor:zoom-in}
+.full{position:fixed;inset:0;z-index:100;background:#fff;display:flex;flex-direction:column}
+.full[hidden]{display:none}
+.fullbar{display:flex;align-items:center;gap:14px;padding:12px var(--gut);border-bottom:2px solid var(--ink)}
+.fullt{font:700 clamp(1.1rem,3vw,1.7rem)/1.2 var(--font)}
+.fullhint{color:var(--mut);font-size:.85rem;margin-left:auto;text-align:right}
+.fullbar .x{background:none;border:0;font-size:32px;line-height:1;cursor:pointer;padding:0 6px;color:var(--ink)}
+.fullbody{flex:1;overflow:auto;padding:18px var(--gut) 30px;display:flex;flex-direction:column;align-items:center}
+.fullbody figure{width:100%;max-width:1300px;margin:0}
+.fullbody figcaption{cursor:default}
+.fullbody figcaption b{display:none}
+.fullbody figcaption span{font-size:clamp(.92rem,1.6vw,1.1rem);margin-bottom:10px}
+.fullbody .exp{display:none}
+.fullbody svg{width:100%;height:auto;max-height:calc(100svh - 200px)}
+@media(max-width:699px){.fullbody svg{min-width:560px;max-height:none}.fullhint{display:none}}
+.seg{display:flex;margin-top:4px}
+.seg button{flex:1;border:1px solid var(--ink);background:#fff;color:var(--ink);font:600 .82rem var(--font);padding:8px 8px;cursor:pointer}
+.seg button+button{border-left:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <p class="kicker">Day 2 &middot; 30 Days 30 Maps</p>
+  <h1>Forest to mill</h1>
+  <p class="dek">Where wood moves by road in the southern United States: modelled haul traffic from FIA forest removals to 117 mills, Oklahoma and Texas to Virginia. A model, not a traffic count.</p>
+</header>
+
+<main class="app" id="app">
+  <div class="mapcol">
+    <div class="mapwrap" id="mapwrap">
+      <canvas id="cv" role="img" aria-label="Map of modelled wood-haul traffic. Drag to pan, pinch or scroll to zoom, tap a forest patch or a mill for detail."></canvas>
+      <div class="ptog"><button id="tl" aria-pressed="true">Layers &amp; model</button><button id="tr" aria-pressed="true">Charts</button></div>
+      <div class="hint" id="hint">Drag &middot; pinch &middot; tap</div>
+      <div class="chip" id="chip"><div id="chiptxt"></div><button id="chipx" aria-label="Clear selection">&times;</button></div>
+      <div class="zoom"><button id="gbtn" aria-label="Show graphs" style="font-size:16px">&#9636;</button><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button><button id="zreset" aria-label="Reset view" style="font-size:15px">&#8634;</button><button id="msize" aria-label="Change map height" style="font-size:15px">&#8597;</button></div>
+    </div>
+    <div class="pop" id="pop" hidden role="dialog" aria-label="Graphs">
+      <header><div class="tabs"><button data-act="poptab" data-tab="sel" aria-pressed="true">This selection</button><button data-act="poptab" data-tab="all" aria-pressed="false">All graphs</button></div><button class="x" data-act="popx" aria-label="Close graphs">&times;</button></header>
+      <div class="popb" id="popb"></div>
+    </div>
+  </div>
+
+  <aside class="side" id="left" aria-label="Layers and model">
+    <section class="blk"><h2>Layers</h2>
+      <div class="layers" id="layers">
+        <button data-l="traffic" aria-pressed="true">Traffic</button>
+        <button data-l="roads" aria-pressed="true">All roads</button>
+        <button data-l="canopy" aria-pressed="true">Tree canopy</button>
+        <button data-l="forest" aria-pressed="false">FIA forest dots</button>
+        <button data-l="states" aria-pressed="true">States</button>
+        <button data-l="labels" aria-pressed="true">Labels</button>
+        <button data-l="grat" aria-pressed="false">Graticule</button>
+        <button data-l="heat" aria-pressed="false">Mills in reach</button>
+      </div></section>
+    <section class="blk"><h2>Model</h2>
+      <div class="ctl"><label for="cap">Haul time cap <output id="capv">120 min</output></label>
+        <input id="cap" type="range" min="30" max="120" step="10" value="120"><small>A patch can only send wood to mills it can reach by road within this time.</small></div>
+      <div class="ctl"><label for="sp">Spread to farther mills <output id="spv">15 min</output></label>
+        <input id="sp" type="range" min="0" max="60" step="5" value="15"><small id="spn"></small></div>
+      <div class="ctl"><label>Where county removals fall <output id="apv">by tree canopy</output></label>
+        <div class="seg" id="apport" role="group" aria-label="How county removals are placed"><button data-v="canopy" aria-pressed="true">By tree canopy</button><button data-v="even" aria-pressed="false">Evenly</button></div>
+        <small>FIA gives county totals only. By canopy puts more of a county&rsquo;s wood where NLCD shows more trees; evenly is the original method. County totals are identical either way.</small></div></section>
+    <section class="blk"><h2>Legend</h2>
+      <div class="legend" id="legend"></div></section>
+    <section class="blk"><h2>Label types</h2>
+      <div class="legend">
+        <span><b class="lk" style="letter-spacing:.22em;font-weight:700;color:#bbb">OKLAHOMA</b>Study state</span>
+        <span><em class="lk" style="color:#777">Missouri</em>Neighbouring state</span>
+        <span><em class="lk" style="color:#6f93a8;letter-spacing:.14em">Gulf</em>Water body</span>
+        <span><b class="lk" style="color:#fff">Macon</b>Mill</span>
+        <span><b class="lk" style="background:#000"><span style="background:#ffa21a;color:#1a1000;padding:1px 6px;border-radius:3px">257</span></b>Busiest road segments, million ft³/yr</span>
+      </div></section>
+  </aside>
+
+  <aside class="side" id="right" aria-label="Selection and charts">
+    <section class="blk" aria-label="Key figures"><div class="figs" id="figs"></div></section>
+    <section class="blk"><h2>Selection</h2><div id="sel" aria-live="polite"></div></section>
+    <section class="blk"><h2>Hauling in numbers</h2><p class="muted" style="margin:-4px 0 14px;font-size:.84rem">Click or tap any bar to show it on the map.</p><div id="charts"></div></section>
+    <section class="blk"><h2>Read before citing</h2>
+      <details><summary>How the traffic is built</summary><p>Each forest hex (842 km&sup2;) sends its FIA removals to every mill within the haul cap, weighted by travel time: a mill as many minutes farther than the nearest as the spread setting receives about 37% of the nearest mill&rsquo;s share. Spread zero means the nearest mill only, the original model. Road thickness is the wood summed over every route crossing a segment; each haul counts once, and the empty return uses the same road.</p></details>
+      <details><summary>What &ldquo;forest&rdquo; means here</summary><p>FIA forest land is land at least 10% stocked with trees, at least 1 acre and 120 ft wide; it excludes urban and farm trees. FIA reports county totals, so every hex takes its county&rsquo;s share, and where dots fall inside a hex is illustrative. Each dot is about 19&nbsp;km&sup2; of forest. Hexes under 20% forest are drawn but not treated as wood sources.</p><p>The grey-green underlay is the USFS NLCD tree canopy cover (percent of each 30&nbsp;m pixel under tree crowns, v2025-6), averaged to 2&nbsp;km, for 2021. It is a satellite-modelled measure and is not the FIA definition of forest: it includes street and yard trees and can miss open woodland. FIA gives only county totals, so you can place each county&rsquo;s removals evenly across its hexes or in proportion to canopy; county totals are the same either way.</p></details>
+      <details><summary>Limits of the data</summary><p>Mills are a 117-mill sample with no recorded closure, so empty areas (Texas, Oklahoma, Kentucky) show missing mills as much as distance. Roads are Natural Earth 1:10m major roads; speeds of 48&ndash;80 km/h and 1.10 circuity are assumed. Mill capacity and species are ignored, and there are no truck-route or weight limits.</p></details>
+    </section>
+  </aside>
+</main>
+<footer>
+  Data: USDA Forest Service FIA county estimates (annual removals and forest area, 2016&ndash;2025 evaluations); Natural Earth 1:10m roads; US Census state and county boundaries via us-atlas; author-compiled mill list (Forisk / PPRC 2025, company announcements, trade press). Map: spherical Albers equal-area conic, standard parallels 29.5&deg;N and 45.5&deg;N, origin 37.5&deg;N 96&deg;W.
+</footer>
+</div>
+
+<div class="full" id="full" hidden role="dialog" aria-modal="true" aria-labelledby="fullt">
+  <div class="fullbar"><div class="fullt" id="fullt"></div><span class="fullhint" id="fullhint"></span><button class="x" id="fullx" aria-label="Close enlarged graph">&times;</button></div>
+  <div class="fullbody" id="fullb"></div>
+</div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+"use strict";
+const D=JSON.parse(document.getElementById("data").textContent);
+const $=s=>document.querySelector(s);
+/* ================= data ================= */
+const N=D.n,raw=(()=>{const b=atob(D.e),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u})();
+const C16=new Int16Array(raw.buffer,0,N*4),CLS=raw.subarray(N*8);
+const ex1=i=>C16[4*i]/10,ey1=i=>C16[4*i+1]/10,ex2=i=>C16[4*i+2]/10,ey2=i=>C16[4*i+3]/10;
+const HX=D.hexes.map(r=>({id:r[0],x:r[1],y:r[2],county:r[3],st:r[4],rem:r[5],ff:r[6],km2:r[7],forest:!!r[8],routes:r[9],canopy:r[10],remE:r[5],remC:r[11]}));
+const M=D.mills.map(m=>({i:m[0],id:m[1],name:m[2],co:m[3],st:m[4],type:m[5],x:m[6],y:m[7],nx:m[8],ny:m[9]}));
+const mIdx={};M.forEach((m,i)=>mIdx[m.i]=i);
+const STN={40:"Oklahoma",48:"Texas",5:"Arkansas",22:"Louisiana",28:"Mississippi",1:"Alabama",47:"Tennessee",21:"Kentucky",13:"Georgia",12:"Florida",45:"South Carolina",37:"North Carolina",51:"Virginia"};
+const C={bg:"#000",land:"#0b0b0b",study:"#141414",stS:"#a6a6a6",stO:"#303030",road:"#5c5c5c",traf:"#ffa21a",forest:["#46604d","#58796a","#78997a"],mill:"#fff",r0:"#fff",r1:"#4dd0e1",nbr:"#7a7a7a",wat:"#6f93a8",grat:"#262626"};
+const REF=270,wOf=l=>0.35+3.7*Math.sqrt(l/REF);
+const L={traffic:1,roads:1,canopy:1,forest:0,states:1,labels:1,grat:0,heat:0};
+let apport="canopy";
+function applyRem(){for(const h of HX)h.rem=apport==="canopy"?h.remC:h.remE}
+let cap=120,spread=15,sel=null,foc=null;   /* sel: single hex|mill.  foc: a set of patches chosen from a chart */
+function hexPts(h){const p=[];for(let j=0;j<6;j++){const a=D.hexRot+j*Math.PI/3;p.push([h.x+D.hexR*Math.cos(a),h.y+D.hexR*Math.sin(a)])}return p}
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+HX.forEach(h=>{const r=rng(h.id*2654435761+1),n=Math.round(h.km2/19),nc=Math.max(1,Math.round(1+h.ff*4)),c=[],d=[];
+ for(let i=0;i<nc;i++){const a=r()*6.283,q=Math.sqrt(r())*11;c.push([Math.cos(a)*q,Math.sin(a)*q])}
+ const sg=4+7*h.ff;for(let i=0;i<n;i++){const cc=c[Math.floor(r()*nc)];let x,y,g=0;do{x=cc[0]+(r()+r()+r()-1.5)*sg*1.6;y=cc[1]+(r()+r()+r()-1.5)*sg*1.6;g++}while(x*x+y*y>240&&g<8);if(x*x+y*y>240){x*=.6;y*=.6}d.push(x,y,Math.floor(r()*3))}
+ h.dots=d});
+/* ================= model ================= */
+const inCap=h=>h.routes.filter(r=>r[1]<=cap);
+const nearest=h=>h.routes.length&&h.routes[0][1]<=cap?h.routes[0]:null;
+function shares(h){const rs=inCap(h);if(!rs.length)return[];const t0=rs[0][1],w=rs.map(r=>spread===0?(r[1]===t0?1:0):Math.exp(-(r[1]-t0)/spread)),s=w.reduce((a,b)=>a+b,0);return rs.map((r,i)=>[r,w[i]/s])}
+let load=new Float64Array(N),mload=new Float64Array(M.length),trafIdx=[],tags=[];
+function recompute(){load.fill(0);mload.fill(0);
+ for(const h of HX){const v=h.rem||0;if(!v)continue;for(const[r,f]of shares(h)){const q=v*f;mload[mIdx[r[0]]]+=q;for(const id of r[4])load[id]+=q}}
+ trafIdx=[];for(let i=0;i<N;i++)if(load[i]>=.5)trafIdx.push(i);trafIdx.sort((a,b)=>load[a]-load[b]);
+ tags=[];for(const i of trafIdx.slice().reverse()){if(load[i]<40||tags.length>=7)break;const mx=(ex1(i)+ex2(i))/2,my=(ey1(i)+ey2(i))/2;if(tags.every(t=>Math.hypot(t.x-mx,t.y-my)>230))tags.push({x:mx,y:my,v:load[i]})}}
+const catchment=mi=>{const out=[];HX.forEach((h,i)=>{if(h.routes.some(r=>r[0]===M[mi].i&&r[1]<=cap))out.push(i)});return out};
+const nearestBin=h=>{const r=nearest(h);return r?Math.floor(r[1]/10):-1};
+const nearestClass=h=>{const r=nearest(h);return r?Math.min(Math.floor(r[1]/30),3):4};
+const topMills=n=>M.map((m,i)=>i).sort((a,b)=>mload[b]-mload[a]).slice(0,n);
+/* ================= view ================= */
+const wrap=$("#mapwrap"),cv=$("#cv"),base=document.createElement("canvas");
+let W=0,H=0,dpr=1,k=1,ox=0,oy=0,fitK=1,baseT=null,baseDirty=true,gesturing=false,touched=false,rb=null,anim=0;
+let bx0=1e9,bx1=-1e9,by0=1e9,by1=-1e9;HX.forEach(h=>{bx0=Math.min(bx0,h.x-20);bx1=Math.max(bx1,h.x+20);by0=Math.min(by0,h.y-20);by1=Math.max(by1,h.y+20)});
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+function boxView(x0,x1,y0,y1,fill=.92,inL=0){const Wu=Math.max(80,W-inL),nk=Math.min(Wu/(x1-x0),H/(y1-y0))*fill;return{k:nk,ox:inL+Wu/2-nk*(x0+x1)/2,oy:H/2+nk*(y0+y1)/2}}
+function fit(){const v=boxView(bx0,bx1,by0,by1,.97);fitK=v.k;k=v.k;ox=v.ox;oy=v.oy}
+function resize(){const r=wrap.getBoundingClientRect();W=Math.max(1,r.width);H=Math.max(1,r.height);dpr=Math.min(window.devicePixelRatio||1,2.5);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+ fitK=boxView(bx0,bx1,by0,by1,.97).k;if(!touched)fit();baseDirty=true;draw()}
+const X=x=>ox+k*x,Y=y=>oy-k*y;
+function flyTo(v,dur=520){cancelAnimationFrame(anim);touched=true;if(reduce||!W){k=v.k;ox=v.ox;oy=v.oy;baseDirty=true;draw();return}
+ const k0=k,c0x=(W/2-ox)/k,c0y=(oy-H/2)/k,c1x=(W/2-v.ox)/v.k,c1y=(v.oy-H/2)/v.k,t0=performance.now();gesturing=true;
+ const step=t=>{let p=Math.min(1,(t-t0)/dur);p=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;k=k0*Math.pow(v.k/k0,p);const cx=c0x+(c1x-c0x)*p,cy=c0y+(c1y-c0y)*p;ox=W/2-k*cx;oy=H/2+k*cy;draw();
+  if(t-t0<dur)anim=requestAnimationFrame(step);else{k=v.k;ox=v.ox;oy=v.oy;gesturing=false;baseDirty=true;draw()}};anim=requestAnimationFrame(step)}
+function flyToPts(pts,pad=36){if(!pts.length)return;const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);flyTo(boxView(Math.min(...xs)-pad,Math.max(...xs)+pad,Math.min(...ys)-pad,Math.max(...ys)+pad,.9,(innerWidth>=700&&W>560)?Math.min(356,W*.5):0))}
+/* ================= drawing: cached base + live overlay ================= */
+function renderBase(){
+ base.width=Math.round(W*dpr);base.height=Math.round(H*dpr);const b=base.getContext("2d");b.setTransform(dpr,0,0,dpr,0,0);
+ b.fillStyle=C.bg;b.fillRect(0,0,W,H);
+ const inV=(x,y,p)=>x>-p&&x<W+p&&y>-p&&y<H+p;
+ for(const s of D.states){b.fillStyle=s[2]?C.study:C.land;for(const r of s[3]){b.beginPath();for(let i=0;i<r.length;i++){const px=X(r[i][0]),py=Y(r[i][1]);i?b.lineTo(px,py):b.moveTo(px,py)}b.closePath();b.fill()}}
+ if(L.canopy&&canReady){b.imageSmoothingEnabled=true;b.drawImage(CANV,X(D.can.x0),Y(D.can.y1),D.can.w*D.can.cell*k,D.can.h*D.can.cell*k)}
+ if(L.grat){b.strokeStyle=C.grat;b.lineWidth=.8;b.setLineDash([2,4]);for(const g of D.grat){b.beginPath();g.forEach((p,i)=>i?b.lineTo(X(p[0]),Y(p[1])):b.moveTo(X(p[0]),Y(p[1])));b.stroke()}b.setLineDash([])}
+ if(L.forest){const pr=Math.max(.55,Math.min(1.7,k*1.5));b.globalAlpha=.5;
+  for(let ci=0;ci<3;ci++){b.fillStyle=C.forest[ci];b.beginPath();
+   for(const h of HX){const cx=X(h.x),cy=Y(h.y);if(!inV(cx,cy,30))continue;const d=h.dots;for(let i=0;i<d.length;i+=3){if(d[i+2]!==ci)continue;const px=cx+d[i]*k,py=cy-d[i+1]*k;if(pr>1.4){b.moveTo(px+pr,py);b.arc(px,py,pr,0,6.283)}else b.rect(px-pr,py-pr,pr*2,pr*2)}}
+   b.fill()}b.globalAlpha=1}
+ if(L.heat){const col=["","rgba(120,170,255,.28)","rgba(90,140,255,.4)","rgba(170,130,255,.55)"];for(const h of HX){const n=inCap(h).length;if(!n)continue;const p=hexPts(h);b.beginPath();p.forEach((q,i)=>i?b.lineTo(X(q[0]),Y(q[1])):b.moveTo(X(q[0]),Y(q[1])));b.closePath();b.fillStyle=col[Math.min(n,3)];b.fill()}}
+ if(L.states){for(const s of D.states){b.strokeStyle=s[2]?C.stS:C.stO;b.lineWidth=s[2]?1.3:.7;for(const r of s[3]){b.beginPath();for(let i=0;i<r.length;i++){const px=X(r[i][0]),py=Y(r[i][1]);i?b.lineTo(px,py):b.moveTo(px,py)}b.stroke()}}}
+ b.lineCap="round";
+ if(L.roads){const wc=[.95,.7,.85,.7,.4],sc=Math.max(.6,Math.min(1.5,k/.4));b.strokeStyle=C.road;b.globalAlpha=k<.2?.65:1;
+  for(const c of[4,3,1,2,0]){b.lineWidth=Math.max(.35,wc[c]*sc);b.beginPath();for(let i=0;i<N;i++){if(CLS[i]!==c)continue;const x1=X(ex1(i)),y1=Y(ey1(i));if(x1<-60||x1>W+60||y1<-60||y1>H+60)continue;b.moveTo(x1,y1);b.lineTo(X(ex2(i)),Y(ey2(i)))}b.stroke()}b.globalAlpha=1}
+ if(L.traffic){const sc=Math.max(.6,Math.min(1.7,k/.35));
+  for(const pass of[0,1]){b.strokeStyle=pass?C.traf:"rgba(0,0,0,.9)";for(const i of trafIdx){const x1=X(ex1(i)),y1=Y(ey1(i));if(x1<-60||x1>W+60||y1<-60||y1>H+60)continue;b.lineWidth=(wOf(load[i])+(pass?0:1.4))*sc;b.beginPath();b.moveTo(x1,y1);b.lineTo(X(ex2(i)),Y(ey2(i)));b.stroke()}}}
+ baseT={k,ox,oy};baseDirty=false}
+const spaced=s=>s.split("").join(" ");
+const FF=()=>getComputedStyle(document.body).fontFamily;
+function draw(){
+ if(!W)return;const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle=C.bg;c.fillRect(0,0,W,H);
+ if(baseDirty&&!gesturing)renderBase();
+ blit(c);overlay(c)}
+function blit(c){if(!baseT)return;const s=k/baseT.k;c.setTransform(dpr*s,0,0,dpr*s,dpr*(ox-s*baseT.ox),dpr*(oy-s*baseT.oy));c.drawImage(base,0,0,W,H);c.setTransform(dpr,0,0,dpr,0,0)}
+/* what is currently in focus (drives spotlight, routes, mill emphasis, chart highlights) */
+function focusInfo(){
+ if(foc)return{hexes:foc.hexes,mills:new Set(foc.mills)};
+ if(sel&&sel.t==="mill")return{hexes:catchment(sel.i),mills:new Set([sel.i])};
+ if(sel&&sel.t==="hex"){const h=HX[sel.i];return{hexes:[sel.i],mills:new Set(inCap(h).map(r=>mIdx[r[0]])),single:true}}
+ return{hexes:[],mills:new Set()}}
+function overlay(c){
+ c.lineCap="round";c.lineJoin="round";
+ const fi=focusInfo(),sh=sel&&sel.t==="hex"?HX[sel.i]:null;
+ /* spotlight: veil everything, then re-show the cached map inside the chosen hexes */
+ if(!fi.single&&fi.hexes.length){const p2=new Path2D();for(const i of fi.hexes){const p=hexPts(HX[i]);p.forEach((q,j)=>j?p2.lineTo(X(q[0]),Y(q[1])):p2.moveTo(X(q[0]),Y(q[1])));p2.closePath()}
+  c.save();c.fillStyle="rgba(0,0,0,.66)";c.fillRect(0,0,W,H);c.clip(p2);c.fillStyle="#000";c.fillRect(0,0,W,H);blit(c);c.restore();
+  c.strokeStyle="rgba(255,255,255,.45)";c.lineWidth=1;c.stroke(p2)}
+ /* routes feeding the selected mills */
+ if(!fi.single&&fi.mills.size&&fi.hexes.length&&fi.hexes.length<700){c.strokeStyle="rgba(255,255,255,.5)";c.lineWidth=1.1;c.beginPath();
+  for(const i of fi.hexes){const h=HX[i];for(const r of h.routes){if(r[1]>cap||!fi.mills.has(mIdx[r[0]]))continue;for(const id of r[4]){c.moveTo(X(ex1(id)),Y(ey1(id)));c.lineTo(X(ex2(id)),Y(ey2(id)))}}}c.stroke()}
+ /* single patch: routes to every mill in reach, nearest in white */
+ if(sh){const sx=shares(sh);for(let ri=sx.length-1;ri>=0;ri--){const r=sx[ri][0];c.strokeStyle=ri===0?C.r0:C.r1;c.lineWidth=ri===0?3.2:2;c.beginPath();for(const id of r[4]){c.moveTo(X(ex1(id)),Y(ey1(id)));c.lineTo(X(ex2(id)),Y(ey2(id)))}c.stroke();
+   c.setLineDash([4,3]);c.lineWidth=1.3;c.beginPath();c.moveTo(X(sh.x),Y(sh.y));c.lineTo(X(r[2]),Y(r[3]));const m=M[mIdx[r[0]]];c.moveTo(X(m.x),Y(m.y));c.lineTo(X(m.nx),Y(m.ny));c.stroke();c.setLineDash([])}
+  const p=hexPts(sh);c.beginPath();p.forEach((q,i)=>i?c.lineTo(X(q[0]),Y(q[1])):c.moveTo(X(q[0]),Y(q[1])));c.closePath();c.strokeStyle="#fff";c.lineWidth=2;c.stroke()}
+ for(let i=0;i<M.length;i++){const m=M[i],on=fi.mills.has(i);c.beginPath();c.arc(X(m.x),Y(m.y),on?6.5:Math.max(2.3,Math.min(3.8,1.8+k*5)),0,6.283);c.fillStyle=C.mill;c.fill();c.strokeStyle="#000";c.lineWidth=1.3;c.stroke()}
+ if(L.labels)labels(c,fi);
+ scaleBar(c);
+ c.fillStyle="#fff";c.beginPath();c.moveTo(W-30,38);c.lineTo(W-37,56);c.lineTo(W-30,52);c.lineTo(W-23,56);c.closePath();c.fill();c.font="700 11px "+FF();c.textAlign="center";c.textBaseline="bottom";c.fillText("N",W-30,36)}
+function labels(c,fi){
+ const ff=FF(),placed=[],fs=Math.max(9,Math.min(15,8.5+k*14));
+ const place=(txt,x,y,font,col,o={})=>{c.font=font;const lines=txt.split("\n"),w=c.measureText(lines.reduce((a,b)=>a.length>b.length?a:b)).width,px=parseFloat(font.match(/([\d.]+)px/)[1]),h=px*1.2*lines.length;
+  const L0=o.left?x:x-w/2,T0=y-h/2;if(L0<2||L0+w>W-2||T0<2||T0+h>H-2)return false;
+  for(const r of placed)if(L0<r[0]+r[2]+3&&L0+w+3>r[0]&&T0<r[1]+r[3]+2&&T0+h+2>r[1])return false;
+  placed.push([L0,T0,w,h]);c.textAlign=o.left?"left":"center";c.textBaseline="middle";
+  lines.forEach((ln,i)=>{const yy=T0+px*1.2*(i+.5);if(o.halo){c.lineWidth=3.5;c.strokeStyle="#000";c.strokeText(ln,x,yy)}c.fillStyle=col;c.fillText(ln,x,yy)});return true};
+ const order=topMills(M.length);
+ order.forEach((i,rank)=>{const m=M[i];if(!(rank<8||k>.55||fi.mills.has(i)))return;place(m.name.replace(" (","\n("),X(m.x)+9,Y(m.y),"700 "+Math.max(10,fs-1)+"px "+ff,C.r0,{left:true,halo:true})});
+ if(L.traffic)for(const t of tags){const x=X(t.x),y=Y(t.y);if(x<10||x>W-10||y<10||y>H-10)continue;const txt=t.v.toFixed(0);c.font="700 "+Math.max(9,fs-2)+"px "+ff;const w=c.measureText(txt).width+10,h=Math.max(9,fs-2)+7;
+   let hit=false;for(const r of placed)if(x-w/2<r[0]+r[2]&&x+w/2>r[0]&&y-h/2<r[1]+r[3]&&y+h/2>r[1])hit=true;if(hit)continue;placed.push([x-w/2,y-h/2,w,h]);
+   c.fillStyle=C.traf;c.strokeStyle="#000";c.lineWidth=1.5;c.beginPath();c.roundRect?c.roundRect(x-w/2,y-h/2,w,h,3):c.rect(x-w/2,y-h/2,w,h);c.fill();c.stroke();c.fillStyle="#1a1000";c.textAlign="center";c.textBaseline="middle";c.fillText(txt,x,y+.5)}
+ for(const s of D.sl){const txt=k<.2?s[1]:spaced(s[0].toUpperCase());place(txt,X(s[2]),Y(s[3]),"700 "+fs+"px "+ff,"rgba(220,220,220,.8)",{halo:true})}
+ for(const w of D.water)place(w[0].split("\n").map(spaced).join("\n"),X(w[1]),Y(w[2]),"italic 400 "+(fs+2)+"px "+ff,C.wat);
+ place(spaced("MEXICO"),X(D.mexico[0]),Y(D.mexico[1]),"400 "+fs+"px "+ff,C.nbr);
+ if(k>.1)for(const n of D.nbr)place(n[0],X(n[1]),Y(n[2]),"italic 400 "+Math.max(9,fs-2)+"px "+ff,C.nbr)}
+function scaleBar(c){const nice=[10,20,50,100,200,500,1000],target=110/k;let km=nice[0];for(const n of nice)if(n<=target)km=n;const px=km*k,x0=14,y0=H-20;
+ c.fillStyle="#fff";c.strokeStyle="#fff";c.lineWidth=1;c.fillRect(x0,y0-4,px/2,4);c.strokeRect(x0,y0-4,px,4);c.font="600 11px "+FF();c.textAlign="left";c.textBaseline="bottom";c.fillText(km+" km  /  "+Math.round(km/1.609)+" mi",x0,y0-8)}
+/* ================= gestures ================= */
+const ptrs=new Map();let pinch=null,moved=0,down=null;
+const rel=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+function rebaseSoon(){clearTimeout(rb);rb=setTimeout(()=>{gesturing=false;baseDirty=true;draw()},110)}
+cv.addEventListener("pointerdown",e=>{cancelAnimationFrame(anim);cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,rel(e));gesturing=true;touched=true;moved=0;$("#hint").style.display="none";
+ if(ptrs.size===1)down=rel(e);if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),k,ox,oy,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2}}});
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;const p=ptrs.get(e.pointerId),n=rel(e);
+ if(ptrs.size===2&&pinch){ptrs.set(e.pointerId,n);const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,mx=(pinch.cx-pinch.ox)/pinch.k,my=(pinch.oy-pinch.cy)/pinch.k;
+  k=Math.max(fitK*.7,Math.min(pinch.k*d/pinch.d,7));ox=cx-k*mx;oy=cy+k*my;moved=99;draw()}
+ else if(ptrs.size===1){const dx=n.x-p.x,dy=n.y-p.y;moved+=Math.abs(dx)+Math.abs(dy);ptrs.set(e.pointerId,n);if(moved>6){ox+=dx;oy+=dy;draw()}}});
+const endp=e=>{if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);pinch=null;if(ptrs.size===1)moved=99;
+ if(ptrs.size===0){if(moved<=6&&down&&e.type==="pointerup")tap(down.x,down.y);rebaseSoon()}};
+cv.addEventListener("pointerup",endp);cv.addEventListener("pointercancel",endp);
+function zoomAt(f,ax,ay){const mx=(ax-ox)/k,my=(oy-ay)/k;k=Math.max(fitK*.7,Math.min(k*f,7));ox=ax-k*mx;oy=ay+k*my}
+cv.addEventListener("wheel",e=>{e.preventDefault();cancelAnimationFrame(anim);touched=true;const p=rel(e);gesturing=true;zoomAt(Math.exp(-e.deltaY*(e.ctrlKey?.01:.0016)),p.x,p.y);draw();rebaseSoon()},{passive:false});
+cv.addEventListener("dblclick",e=>{const p=rel(e);touched=true;zoomAt(1.8,p.x,p.y);baseDirty=true;draw()});
+const zoomBy=f=>{cancelAnimationFrame(anim);touched=true;zoomAt(f,W/2,H/2);baseDirty=true;draw()};
+$("#zin").onclick=()=>zoomBy(1.6);$("#zout").onclick=()=>zoomBy(1/1.6);$("#zreset").onclick=()=>{clearAll();touched=false;const v=boxView(bx0,bx1,by0,by1,.97);flyTo(v)};
+let hs=0;$("#msize").onclick=()=>{hs=(hs+1)%3;document.documentElement.style.setProperty("--maph",["44svh","30svh","72svh"][hs])};
+$("#tl").onclick=e=>{const a=$("#app").classList.toggle("hl");e.target.setAttribute("aria-pressed",!a)};
+$("#tr").onclick=e=>{const a=$("#app").classList.toggle("hr");e.target.setAttribute("aria-pressed",!a)};
+/* ================= selection + focus ================= */
+function pick(mx,my){let bm=-1,bd=26*26;M.forEach((m,i)=>{const d=(X(m.x)-mx)**2+(Y(m.y)-my)**2;if(d<bd){bd=d;bm=i}});if(bm>=0)return{t:"mill",i:bm};
+ const x=(mx-ox)/k,y=(oy-my)/k;let best=-1,b2=1e9;HX.forEach((h,i)=>{const d=(h.x-x)**2+(h.y-y)**2;if(d<b2){b2=d;best=i}});return b2<20*20?{t:"hex",i:best}:null}
+function tap(x,y){const p=pick(x,y);if(p)choose(p);else clearAll()}
+function choose(p){foc=null;sel=p;flyToSel();refresh()}
+function clearAll(){sel=null;foc=null;refresh()}
+function setFocus(key,label,build,hl){ /* build() -> {hexes:[idx], mills:[idx], sub:string} so it can be recomputed when sliders move */
+ if(foc&&foc.key===key){clearAll();return}
+ sel=null;foc={key,label,build,hl};applyFocus();flyToSel();refresh()}
+function applyFocus(){const r=foc.build();foc.hexes=r.hexes;foc.mills=r.mills;foc.sub=r.sub}
+function flyToSel(){const pts=[];
+ if(foc){foc.hexes.forEach(i=>pts.push([HX[i].x,HX[i].y]));foc.mills.forEach(i=>pts.push([M[i].x,M[i].y]))}
+ else if(sel&&sel.t==="hex"){const h=HX[sel.i];pts.push([h.x,h.y]);inCap(h).forEach(r=>{const m=M[mIdx[r[0]]];pts.push([m.x,m.y])})}
+ else if(sel){const m=M[sel.i];pts.push([m.x,m.y]);catchment(sel.i).forEach(i=>pts.push([HX[i].x,HX[i].y]))}
+ if(pts.length===1)pts.push([pts[0][0]+40,pts[0][1]+40]);flyToPts(pts)}
+const pop={open:false,tab:"sel"};let CH_HTML="";
+function refresh(){const was=pop.open;if(sel||foc){pop.open=true;pop.tab="sel"}else if(pop.tab==="sel")pop.open=false;selUI();charts();draw();
+ if(pop.open&&!was&&innerWidth<700){const r=document.querySelector(".mapcol").getBoundingClientRect();if(r.top>4)window.scrollBy({top:r.top-4,behavior:"smooth"})}}
+$("#chipx").onclick=clearAll;
+const sumRem=a=>a.reduce((s,i)=>s+(HX[i].rem||0),0);
+function servedBy(hexes){const v=new Map();for(const i of hexes){const h=HX[i],r=h.rem||0;if(!r)continue;for(const[rt,f]of shares(h))v.set(mIdx[rt[0]],(v.get(mIdx[rt[0]])||0)+r*f)}return[...v.entries()].sort((a,b)=>b[1]-a[1])}
+function selUI(){const s=$("#sel"),chip=$("#chip"),ct=$("#chiptxt");
+ if(foc){const t=servedBy(foc.hexes).slice(0,6);
+  s.innerHTML='<div class="nm">'+foc.label+'</div><div class="muted">'+foc.sub+'</div>'+(t.length?'<h2 style="margin-top:14px">Mills receiving this wood</h2><table>'+t.map(([mi,v])=>'<tr><td><a href="#" data-act="mill" data-i="'+mi+'" style="color:inherit">'+M[mi].name+'</a> <span class="muted">'+M[mi].st+'</span></td><td>'+v.toFixed(0)+' M ft³</td></tr>').join("")+'</table>':'<p class="muted">No sample mill in reach of these patches.</p>')+'<p><button class="btn" data-act="clear">Clear</button></p>';
+  ct.innerHTML='<b>'+foc.label+'</b><small>'+foc.sub+'</small>';chip.classList.add("on");$("#hint").style.display="none";return}
+ if(!sel){s.innerHTML='<span class="muted">Tap a forest patch to see every mill it can reach by road, or a mill to see what feeds it. Or pick a bar in a chart below.</span>';chip.classList.remove("on");return}
+ if(sel.t==="hex"){const h=HX[sel.i],sx=shares(h),title=h.county+" County, "+STN[h.st];
+  s.innerHTML='<div class="nm">'+title+'</div><div class="muted">NLCD canopy '+h.canopy+'% &middot; FIA county forest '+Math.round(h.ff*100)+'% &middot; '+(h.forest?(h.rem==null?"no removals estimate":h.rem+" million ft³/yr of removals apportioned here"):"under 20% forest, so not a modelled wood source")+'</div>'+
+   (h.forest?'<p style="margin:.6em 0 0"><b style="font-size:1.5rem">'+sx.length+'</b> mill'+(sx.length==1?"":"s")+' within '+cap+' min by road</p>':'')+
+   (sx.length?'<table>'+sx.map(([r,f])=>{const m=M[mIdx[r[0]]];return'<tr><td><a href="#" data-act="mill" data-i="'+mIdx[r[0]]+'" style="color:inherit">'+m.name+'</a> <span class="muted">'+m.st+' &middot; '+m.type+'</span></td><td>'+r[1]+' min &middot; '+Math.round(f*100)+'%</td></tr>'}).join("")+'</table><p class="muted" style="font-size:.82rem;margin:6px 0 0">White route = nearest mill, cyan = the others. Percent = share of this patch&rsquo;s wood sent there.</p>':(h.forest?'<p class="muted">No sample mill within the cap: a real distance, or a mill missing from the list.</p>':'')) +'<p><button class="btn" data-act="clear">Clear</button></p>';
+  ct.innerHTML='<b>'+title+'</b><small>'+sx.length+' mill'+(sx.length==1?"":"s")+' in reach &middot; '+Math.round(h.ff*100)+'% forest</small>'}
+ else{const m=M[sel.i],hx=catchment(sel.i),ex=hx.filter(i=>inCap(HX[i]).length===1);
+  s.innerHTML='<div class="nm">'+m.name+'</div><div class="muted">'+m.st+' &middot; '+m.type+(m.co?' &middot; '+m.co:'')+'</div><p style="margin:.6em 0 0"><b style="font-size:1.5rem">'+mload[sel.i].toFixed(0)+'</b> million ft³/yr modelled to arrive</p><table><tr><td>Forest patches in reach</td><td>'+hx.length+'</td></tr><tr><td>Wood in those patches</td><td>'+sumRem(hx).toFixed(0)+' M ft³/yr</td></tr><tr><td>Patches with no other mill in range</td><td>'+ex.length+'</td></tr></table><p class="muted" style="font-size:.82rem;margin:6px 0 0">Arrival depends on the spread setting; mill capacity is ignored.</p><p><button class="btn" data-act="clear">Clear</button></p>';
+  ct.innerHTML='<b>'+m.name+'</b><small>'+mload[sel.i].toFixed(0)+' M ft³/yr &middot; '+hx.length+' patches</small>'}
+ chip.classList.add("on");$("#hint").style.display="none"}
+/* ================= charts (clickable, and lit up by map selection) ================= */
+const TCOL=["#d9d9d9","#a3a3a3","#5e5e5e","#111"],NONE="#f1f1f1",TYPEC={pulp:"#7a6fa8",sawmill:"#b9915a",osb:"#5c93a6",plywood:"#c2705a",mdf:"#8d9650",paper:"#a8668a",other:"#999"};
+const EXP='<button class="exp" data-act="expand" aria-label="Enlarge this graph">\u2922 Enlarge</button>';
+const svgOpen=(w,h)=>'<svg viewBox="0 0 '+w+' '+h+'">';
+function stats(){const F=HX.filter(h=>h.forest),tot=F.reduce((s,h)=>s+(h.rem||0),0);let reached=0;const ts=[];
+ for(const h of F){const r=nearest(h);if(r){reached+=h.rem||0;ts.push([r[1],h.rem||0])}}ts.sort((a,b)=>a[0]-b[0]);let c=0,med=0;for(const[t,v]of ts){c+=v;if(c>=reached/2){med=t;break}}
+ return{F,tot,reached,med,ts}}
+function figs(){const s=stats(),recv=mload.reduce((n,v)=>n+(v>0),0),lim=cap===120?"2 h":cap+" min";
+ $("#figs").innerHTML=[[(s.tot/1000).toFixed(1)+" bn","ft³ a year of FIA removals in forest hexes (≥20%)"],[Math.round(s.reached/s.tot*100)+"%","of removals within a "+lim+" haul of a sample mill"],[Math.round(s.med)+" min","median haul to the nearest mill"],[recv,"mills receiving modelled wood"]].map(a=>'<div class="fig"><b>'+a[0]+'</b><span>'+a[1]+'</span></div>').join("")}
+/* highlight sets derived from the current selection or focus */
+function highlights(){const o={A:new Set(),B:new Set(),C:new Set(),D:new Set()};
+ if(foc&&foc.hl)for(const kk of Object.keys(foc.hl))for(const v of foc.hl[kk])o[kk].add(v);
+ else if(sel&&sel.t==="hex"){const h=HX[sel.i];if(h.forest){o.A.add(nearestBin(h));o.B.add(String(h.st));o.D.add(Math.min(inCap(h).length,3))}inCap(h).forEach(r=>o.C.add(mIdx[r[0]]))}
+ else if(sel&&sel.t==="mill")o.C.add(sel.i);
+ return o}
+const op=(set,key,extra)=>set.size===0||set.has(key)||(extra!==undefined&&set.has(extra))?1:.28;
+function charts(){const s=stats(),tot=s.tot,hl=highlights();let out="";
+ /* A: haul time */
+ {const w=360,h=190,pl=34,pr=34,pt=14,pb=34,bins=Math.ceil(cap/10),ws=new Array(bins).fill(0);for(const[t,v]of s.ts)ws[Math.min(Math.floor(t/10),bins-1)]+=v;const pc=ws.map(v=>v/tot*100),mx=Math.max(...pc,1)*1.15,bw=(w-pl-pr)/bins;
+  let g=svgOpen(w,h),cum=0,pts=[];
+  for(let i=0;i<=4;i++){const y=pt+(h-pt-pb)*(1-i/4);g+='<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y+'" y2="'+y+'" stroke="#e6e6e6"/><text x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#6a6a6a">'+(mx*i/4).toFixed(0)+'</text><text x="'+(w-pr+6)+'" y="'+(y+4)+'" font-size="11" fill="#6a6a6a">'+(25*i)+'</text>'}
+  pc.forEach((v,i)=>{const x=pl+i*bw,bh=(h-pt-pb)*v/mx;g+='<g data-act="A" data-i="'+i+'" tabindex="0" role="button" aria-label="Patches whose nearest mill is '+i*10+' to '+(i*10+10)+' minutes away"><rect x="'+x+'" y="'+pt+'" width="'+bw+'" height="'+(h-pt-pb)+'" fill="transparent"/><rect x="'+(x+1)+'" y="'+(h-pb-bh)+'" width="'+(bw-2)+'" height="'+bh+'" fill="'+TCOL[Math.min(Math.floor(i*10/30),3)]+'" opacity="'+op(hl.A,i)+'"/></g>';cum+=v;pts.push((x+bw/2)+","+(h-pb-(h-pt-pb)*cum/100))});
+  g+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="#111" stroke-width="1.6" pointer-events="none"/>';
+  const mxp=pl+s.med/10*bw;g+='<line x1="'+mxp+'" x2="'+mxp+'" y1="'+pt+'" y2="'+(h-pb)+'" stroke="#d9531e" stroke-width="1.6" stroke-dasharray="4 3" pointer-events="none"/><text x="'+(mxp+5)+'" y="'+(pt+10)+'" font-size="12" font-weight="700" fill="#d9531e" pointer-events="none">median '+Math.round(s.med)+' min</text>';
+  for(let t=0;t<=cap;t+=30)g+='<text x="'+(pl+t/10*bw)+'" y="'+(h-pb+16)+'" text-anchor="middle" font-size="11" fill="#6a6a6a">'+t+'</text>';
+  g+='<text x="'+pl+'" y="'+(h-4)+'" font-size="11" fill="#6a6a6a">minutes by road to the nearest mill</text><text x="'+(w-pr+6)+'" y="'+(pt-2)+'" font-size="10" fill="#6a6a6a">cum. %</text></svg>';
+  out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>A &nbsp;Haul time to the nearest mill</b><span>Bars: % of removals per 10 minutes (left axis). Line: cumulative % (right axis). Pick a bar to see those patches.</span></figcaption>'+g+'</figure>'}
+ /* B: by state */
+ {const sd={};for(const h of s.F){const a=sd[h.st]||(sd[h.st]=[0,0,0,0,0]);a[nearestClass(h)]+=h.rem||0}
+  const ord=Object.keys(sd).sort((a,b)=>sd[b].reduce((x,y)=>x+y)-sd[a].reduce((x,y)=>x+y)),mx=Math.max(...ord.map(q=>sd[q].reduce((x,y)=>x+y))),w=360,rh=18,pl=96,pr=60,h=ord.length*rh+34;
+  let g=svgOpen(w,h);ord.forEach((st,i)=>{const y=i*rh+2,tt=sd[st].reduce((a,b)=>a+b);
+   g+='<text data-act="Bs" data-st="'+st+'" tabindex="0" role="button" x="'+(pl-6)+'" y="'+(y+12)+'" text-anchor="end" font-size="12" fill="#111" font-weight="'+(hl.B.has(st)?700:400)+'" opacity="'+op(hl.B,st)+'">'+STN[st]+'</text>';let x=pl;
+   sd[st].forEach((v,ci)=>{const bw=v/mx*(w-pl-pr);g+='<rect data-act="Bc" data-st="'+st+'" data-ci="'+ci+'" tabindex="0" role="button" x="'+x+'" y="'+y+'" width="'+Math.max(0,bw)+'" height="'+(rh-4)+'" fill="'+(ci<4?TCOL[ci]:NONE)+'"'+(ci===4?' stroke="#ddd" stroke-width=".6"':'')+' opacity="'+op(hl.B,st,st+":"+ci)+'"/>';x+=bw});
+   g+='<text x="'+(x+5)+'" y="'+(y+12)+'" font-size="11" fill="#6a6a6a" opacity="'+op(hl.B,st)+'" pointer-events="none">'+Math.round((1-sd[st][4]/tt)*100)+'% reached</text>'});
+  const ly=h-12;["0–30","30–60","60–90","90–120","none"].forEach((l,i)=>{const x=pl+i*52;g+='<rect x="'+x+'" y="'+(ly-8)+'" width="9" height="9" fill="'+(i<4?TCOL[i]:NONE)+'"'+(i===4?' stroke="#ccc" stroke-width=".6"':'')+'/><text x="'+(x+13)+'" y="'+ly+'" font-size="10.5" fill="#6a6a6a">'+l+'</text>'});
+  g+='</svg>';out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>B &nbsp;How far is each state&rsquo;s wood from a mill?</b><span>Removals by minutes to the nearest sample mill, million ft³ a year. Pick a state, or one segment of a bar.</span></figcaption>'+g+'</figure>'}
+ /* C: busiest mills */
+ {const top=topMills(10),mx=mload[top[0]]||1,w=360,rh=20,pl=134,pr=36,h=top.length*rh+8;let g=svgOpen(w,h);
+  top.forEach((i,j)=>{const m=M[i],y=j*rh+2,bw=mload[i]/mx*(w-pl-pr);g+='<g data-act="C" data-i="'+i+'" tabindex="0" role="button" aria-label="'+m.name+'" opacity="'+op(hl.C,i)+'"><rect x="0" y="'+y+'" width="'+w+'" height="'+(rh-2)+'" fill="transparent"/><text x="'+(pl-6)+'" y="'+(y+13)+'" text-anchor="end" font-size="12" fill="#111">'+(m.name.length>19?m.name.slice(0,18)+"…":m.name)+' '+m.st+'</text><rect x="'+pl+'" y="'+y+'" width="'+bw+'" height="'+(rh-5)+'" fill="'+(TYPEC[m.type]||"#999")+'"/><text x="'+(pl+bw+5)+'" y="'+(y+13)+'" font-size="11" fill="#6a6a6a">'+mload[i].toFixed(0)+'</text></g>'});
+  g+='</svg>';const ts=[...new Set(top.map(i=>M[i].type))];
+  out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>C &nbsp;Busiest mills</b><span>Modelled wood received, million ft³ a year. '+ts.map(t=>'<i style="display:inline-block;width:9px;height:9px;background:'+(TYPEC[t]||"#999")+';margin:0 4px 0 6px"></i>'+t).join("")+'</span></figcaption>'+g+'<div class="minis"><button class="btn" data-act="Ctop" data-n="3">Show top 3 together</button><button class="btn" data-act="Ctop" data-n="10">Show top 10</button></div></figure>'}
+ /* D: mills in reach */
+ {const cw=[0,0,0,0];for(const h of s.F)cw[Math.min(inCap(h).length,3)]+=h.rem||0;const w=360,hh=150,pl=34,pt=16,pb=28,bw=(w-pl-10)/4,mx=Math.max(...cw)/tot*100*1.15;let g=svgOpen(w,hh);
+  cw.forEach((v,i)=>{const p=v/tot*100,bh=(hh-pt-pb)*p/mx,x=pl+i*bw;g+='<g data-act="D" data-i="'+i+'" tabindex="0" role="button" opacity="'+op(hl.D,i)+'"><rect x="'+x+'" y="'+pt+'" width="'+bw+'" height="'+(hh-pt-pb)+'" fill="transparent"/><rect x="'+(x+10)+'" y="'+(hh-pb-bh)+'" width="'+(bw-20)+'" height="'+bh+'" fill="'+(i?TCOL[Math.min(i,3)]:NONE)+'"'+(i?'':' stroke="#ccc"')+'/><text x="'+(x+bw/2)+'" y="'+(hh-pb-bh-5)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#111">'+p.toFixed(0)+'%</text><text x="'+(x+bw/2)+'" y="'+(hh-pb+16)+'" text-anchor="middle" font-size="12" fill="#111">'+(i===3?"3+":i)+' mill'+(i===1?"":"s")+'</text></g>'});
+  g+='</svg>';out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>D &nbsp;How many mills can a patch reach?</b><span>Share of removals by number of sample mills in reach. Pick a bar: zero shows where no mill is in range.</span></figcaption>'+g+'</figure>'}
+ CH_HTML=out;$("#charts").innerHTML=out;popUI()}
+/* ================= pop-up graphs ================= */
+const fig2=(t,sub,svg)=>'<figure style="margin:0 0 16px"><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>'+t+'</b><span>'+sub+'</span></figcaption>'+svg+'</figure>';
+function hbars(rows,max,o={}){const w=340,rh=22,pl=o.pl||124,pr=o.pr||70,h=rows.length*rh+4;let g='<svg viewBox="0 0 '+w+' '+h+'">';
+ rows.forEach((r,j)=>{const y=j*rh+2,bw=Math.max(1,r.v/max*(w-pl-pr));
+  g+='<g'+(r.act?' data-act="'+r.act+'" data-i="'+r.i+'" data-st="'+(r.st||"")+'" tabindex="0" role="button"':'')+'><rect x="0" y="'+y+'" width="'+w+'" height="'+(rh-2)+'" fill="transparent"/><text x="'+(pl-6)+'" y="'+(y+14)+'" text-anchor="end" font-size="12" fill="#111">'+r.label+'</text><rect x="'+pl+'" y="'+y+'" width="'+bw+'" height="'+(rh-6)+'" fill="'+(r.col||"#111")+'"/><text x="'+(pl+bw+5)+'" y="'+(y+14)+'" font-size="11" fill="#6a6a6a">'+r.text+'</text></g>'});
+ return g+'</svg>'}
+function vcols(vals,labels,cols,fmt){const w=340,h=140,pl=8,pt=18,pb=26,bw=(w-pl*2)/vals.length,mx=Math.max(...vals,1e-9)*1.12;let g='<svg viewBox="0 0 '+w+' '+h+'">';
+ vals.forEach((v,i)=>{const bh=(h-pt-pb)*v/mx,x=pl+i*bw;g+='<rect x="'+(x+8)+'" y="'+(h-pb-bh)+'" width="'+(bw-16)+'" height="'+bh+'" fill="'+cols[i]+'"'+(cols[i]===NONE?' stroke="#ccc"':'')+'/><text x="'+(x+bw/2)+'" y="'+(h-pb-bh-5)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#111">'+fmt(v)+'</text><text x="'+(x+bw/2)+'" y="'+(h-pb+16)+'" text-anchor="middle" font-size="11" fill="#6a6a6a">'+labels[i]+'</text>'});
+ return g+'</svg>'}
+const shortName=m=>(m.name.length>17?m.name.slice(0,16)+"…":m.name)+" "+m.st;
+const popHead=(t,s)=>'<div style="font:700 1.15rem/1.2 var(--font)">'+t+'</div><div class="muted" style="margin:2px 0 12px;font-size:.88rem">'+s+'</div>';
+function popSel(){
+ if(foc){const t=servedBy(foc.hexes).slice(0,8),cl=[0,0,0,0,0];for(const i of foc.hexes){const h=HX[i];if(h.forest)cl[nearestClass(h)]+=h.rem||0}
+  return popHead(foc.label,foc.sub)+(t.length?fig2("Mills receiving this wood","Modelled million ft³ a year. Tap a mill to open it.",hbars(t.map(([mi,v])=>({label:shortName(M[mi]),v,text:v.toFixed(0),col:TYPEC[M[mi].type]||"#999",act:"mill",i:mi})),t[0][1])):'<p class="muted">No sample mill in reach of these patches.</p>')+
+   fig2("Haul time of these patches","Wood by minutes to the nearest mill, million ft³ a year.",vcols(cl,["0–30","30–60","60–90","90–120","none"],[...TCOL,NONE],v=>v.toFixed(0)))}
+ if(!sel)return '<p class="muted">Tap a forest patch or a mill on the map, or pick a bar in a chart, and its graphs appear here.</p>';
+ if(sel.t==="hex"){const h=HX[sel.i],sx=shares(h),t=h.county+" County, "+STN[h.st];
+  if(!h.forest)return popHead(t,"NLCD canopy "+h.canopy+"% · FIA county forest "+Math.round(h.ff*100)+"%")+'<p class="muted">Under 20% forest, so this patch is not modelled as a wood source.</p>';
+  if(!sx.length)return popHead(t,"NLCD canopy "+h.canopy+"% · FIA county forest "+Math.round(h.ff*100)+"% · "+(h.rem==null?"no removals estimate":h.rem+" M ft³/yr"))+'<p class="muted">No sample mill within '+cap+' minutes. That can be real distance or a mill missing from the list.</p>';
+  return popHead(t,"NLCD canopy "+h.canopy+"% · FIA county forest "+Math.round(h.ff*100)+"% · "+(h.rem==null?"no removals estimate":h.rem+" M ft³/yr of removals"))+
+   fig2("Minutes by road to each mill","Black = nearest. Label: minutes and share of this patch's wood. Tap a mill.",hbars(sx.map(([r,f],ri)=>({label:shortName(M[mIdx[r[0]]]),v:r[1],text:r[1]+" min · "+Math.round(f*100)+"%",col:ri?"#a3a3a3":"#111",act:"mill",i:mIdx[r[0]]})),cap,{pr:96}))+
+   fig2("Where this patch's wood goes","Million ft³ a year, split by the spread setting.",hbars(sx.map(([r,f])=>({label:shortName(M[mIdx[r[0]]]),v:(h.rem||0)*f,text:((h.rem||0)*f).toFixed(1),col:TYPEC[M[mIdx[r[0]]].type]||"#999",act:"mill",i:mIdx[r[0]]})),Math.max((h.rem||0)*sx[0][1],1e-6),{pr:50}))}
+ const mi=sel.i,m=M[mi],cls=[0,0,0,0],bySt={};
+ for(const hi of catchment(mi)){const h=HX[hi],e=shares(h).find(([r])=>mIdx[r[0]]===mi);if(!e)continue;const v=(h.rem||0)*e[1];cls[Math.min(Math.floor(e[0][1]/30),3)]+=v;bySt[h.st]=(bySt[h.st]||0)+v}
+ const st=Object.entries(bySt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ return popHead(m.name,m.st+" · "+m.type+" · "+mload[mi].toFixed(0)+" M ft³/yr modelled to arrive")+
+  fig2("Wood arriving, by haul time","Million ft³ a year, by minutes from the patch to this mill.",vcols(cls,["0–30","30–60","60–90","90–120"],TCOL,v=>v.toFixed(0)))+
+  (st.length?fig2("Where it comes from","Source state, million ft³ a year. Tap a state to see it on the map.",hbars(st.map(([s,v])=>({label:STN[s],v,text:v.toFixed(0),col:"#5e5e5e",act:"Bs",i:s,st:s})),st[0][1])):'')}
+function popUI(){const p=$("#pop");p.hidden=!pop.open;if(!pop.open)return;
+ p.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.tab===pop.tab));
+ const st=$("#popb").scrollTop;$("#popb").innerHTML=pop.tab==="all"?CH_HTML:popSel();$("#popb").scrollTop=st}
+$("#gbtn").onclick=()=>{if(pop.open&&pop.tab==="all"){pop.open=false}else{pop.open=true;pop.tab="all"}popUI()};
+/* enlarged (full-screen) graph */
+let fullOpener=null;
+function openFull(el){const fig=el.closest("figure");if(!fig)return;const clone=fig.cloneNode(true);clone.querySelectorAll("figcaption").forEach(f=>f.removeAttribute("data-act"));const title=(fig.querySelector("figcaption b")||{}).textContent||"Graph";
+ $("#fullb").innerHTML="";$("#fullb").appendChild(clone);$("#fullt").textContent=title.replace(/\u00a0/g," ");
+ $("#fullhint").textContent="Click a bar to close this and show it on the map. Esc to close.";
+ fullOpener=el;$("#full").hidden=false;document.body.style.overflow="hidden";$("#fullx").focus()}
+function closeFull(){if($("#full").hidden)return;$("#full").hidden=true;document.body.style.overflow="";if(fullOpener&&document.contains(fullOpener))fullOpener.focus();fullOpener=null}
+$("#fullx").onclick=closeFull;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeFull()});
+/* chart click -> map */
+const forestHexes=f=>{const o=[];HX.forEach((h,i)=>{if(h.forest&&f(h))o.push(i)});return o};
+const millsOf=hx=>[...new Set(hx.flatMap(i=>inCap(HX[i]).map(r=>mIdx[r[0]])))];
+const fmtSub=hx=>hx.length+" forest patches · "+sumRem(hx).toFixed(0)+" M ft³/yr of removals";
+function chartAct(el){const a=el.dataset.act,i=+el.dataset.i;
+ if(a==="expand"){openFull(el);return}
+ closeFull();
+ if(a==="popx"){pop.open=false;popUI();return}
+ if(a==="poptab"){pop.tab=el.dataset.tab;pop.open=true;popUI();return}
+ if(a==="clear"){clearAll();return}
+ if(a==="mill"){choose({t:"mill",i});return}
+ if(a==="C"){if(sel&&sel.t==="mill"&&sel.i===i&&!foc)clearAll();else choose({t:"mill",i});return}
+ if(a==="Ctop"){const n=+el.dataset.n;setFocus("T"+n,"Top "+n+" mills by wood received",()=>{const ms=topMills(n),hx=[...new Set(ms.flatMap(mi=>catchment(mi)))];return{hexes:hx,mills:ms,sub:ms.length+" mills · "+hx.length+" patches in reach · "+ms.reduce((s,mi)=>s+mload[mi],0).toFixed(0)+" M ft³/yr received"}},{C:topMills(n)});return}
+ if(a==="A"){setFocus("A"+i,"Nearest mill "+i*10+"–"+(i*10+10)+" min away",()=>{const hx=forestHexes(h=>nearestBin(h)===i);return{hexes:hx,mills:millsOf(hx),sub:fmtSub(hx)}},{A:[i]});return}
+ if(a==="Bs"){const st=+(el.dataset.st||el.dataset.i);setFocus("B"+st,STN[st],()=>{const hx=[];HX.forEach((h,j)=>{if(h.st===st)hx.push(j)});const f=hx.filter(j=>HX[j].forest),rs=sumRem(f),reach=sumRem(f.filter(j=>nearest(HX[j])));return{hexes:hx,mills:millsOf(f),sub:f.length+" forest patches · "+rs.toFixed(0)+" M ft³/yr · "+Math.round(reach/rs*100)+"% within reach of a mill"}},{B:[String(st)]});return}
+ if(a==="Bc"){const st=+el.dataset.st,ci=+el.dataset.ci,nm=["0–30","30–60","60–90","90–120","no mill in reach"][ci];setFocus("B"+st+":"+ci,STN[st]+": "+(ci<4?nm+" min to the nearest mill":nm),()=>{const hx=forestHexes(h=>h.st===st&&nearestClass(h)===ci);return{hexes:hx,mills:millsOf(hx),sub:fmtSub(hx)}},{B:[st+":"+ci]});return}
+ if(a==="D"){setFocus("D"+i,i===0?"Patches with no mill in reach":(i===3?"Patches reaching 3 or more mills":"Patches reaching exactly "+i+" mill"+(i===1?"":"s")),()=>{const hx=forestHexes(h=>Math.min(inCap(h).length,3)===i);return{hexes:hx,mills:millsOf(hx),sub:fmtSub(hx)}},{D:[i]});return}}
+document.addEventListener("click",e=>{const el=e.target.closest("[data-act]");if(!el)return;e.preventDefault();chartAct(el)});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-act]")){e.preventDefault();chartAct(e.target)}});
+/* ================= controls ================= */
+function legend(){const ws=[1,10,50,150].map(v=>'<span><i class="l" style="height:'+Math.max(1,wOf(v)).toFixed(1)+'px"></i>'+v+' million ft³/yr</span>').join("");
+ $("#legend").innerHTML=ws+'<span><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#000;margin:0 10.5px"></i>Sample mill, no closure recorded</span><span><i style="display:inline-block;width:9px;height:9px;background:#58796a;border-radius:50%;margin:0 10.5px"></i>FIA forest dots (optional), about 19 km² each</span><span><i style="display:inline-block;width:30px;height:10px;background:linear-gradient(90deg,#000,#79a07e);margin:0 0"></i>Tree canopy cover, NLCD '+D.can.year+', 0 to 100%</span>'}
+function update(){applyRem();recompute();if(foc)applyFocus();figs();charts();selUI();baseDirty=true;draw();
+ $("#spn").textContent=spread===0?"Nearest mill only: the package's original model.":"A patch splits its wood across every mill in reach, weighted by e^(−extra minutes ÷ "+spread+"). A mill "+spread+" min farther than the nearest gets about 37% of its share."}
+$("#cap").oninput=e=>{cap=+e.target.value;$("#capv").textContent=cap+" min";update()};
+document.querySelectorAll("#apport button").forEach(b=>b.onclick=()=>{apport=b.dataset.v;document.querySelectorAll("#apport button").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#apv").textContent=apport==="canopy"?"by tree canopy":"evenly";update()});
+$("#sp").oninput=e=>{spread=+e.target.value;$("#spv").textContent=spread===0?"nearest only":spread+" min";update()};
+document.querySelectorAll("#layers button").forEach(b=>b.onclick=()=>{const l=b.dataset.l;L[l]=L[l]?0:1;b.setAttribute("aria-pressed",!!L[l]);baseDirty=true;draw()});
+new ResizeObserver(resize).observe(wrap);
+const CANV=document.createElement("canvas");let canReady=false;
+(function(){const im=new Image();im.onload=()=>{CANV.width=D.can.w;CANV.height=D.can.h;const x=CANV.getContext("2d");x.drawImage(im,0,0);const id=x.getImageData(0,0,CANV.width,CANV.height),d=id.data;
+ for(let i=0;i<d.length;i+=4){const v=d[i]/255;d[i]=118;d[i+1]=158;d[i+2]=124;d[i+3]=Math.round(255*Math.pow(v,.9)*.66)}x.putImageData(id,0,0);canReady=true;baseDirty=true;draw()};
+ im.src="data:image/png;base64,"+D.can.png})();
+resize();legend();update();
+if(matchMedia("(pointer:fine)").matches)$("#hint").style.display="none";
+/* deep links: #hex=ID  #mill=ID  #top=N  #state=FIPS */
+(function(){const m=location.hash.match(/^#(hex|mill|top|state|bin|reach)=(.+)$/);if(!m)return;const v=decodeURIComponent(m[2]);
+ if(m[1]==="hex"){const i=HX.findIndex(h=>h.id==v);if(i>=0)choose({t:"hex",i})}
+ else if(m[1]==="mill"){const i=M.findIndex(x=>x.id===v);if(i>=0)choose({t:"mill",i})}
+ else if(m[1]==="top")chartAct({dataset:{act:"Ctop",n:v}});
+ else if(m[1]==="state")chartAct({dataset:{act:"Bs",st:v}});
+ else if(m[1]==="bin")chartAct({dataset:{act:"A",i:v}});
+ else chartAct({dataset:{act:"D",i:v}})})();
+</script>
+</body>
+</html>
