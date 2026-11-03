@@ -45,12 +45,12 @@ least three hexes it varies by more than 30% around the county mean). Per-hex va
 | Path | What |
 |---|---|
 | `index.html` | The web map, one self-contained file (about 1.5 MB, data inline). |
-| `static-map/` | Print-style posters: main map, label key, scale bar, graticule, one key chart. |
+| `static-map/` | Print-style maps, landscape (paper and night) and portrait 4:5: main map, scale bar, graticule, north arrow, locator, one key chart, legend. |
 | `data/south_connectivity.gpkg` | GeoPackage, custom spherical Albers (metres): `hex_forest_connectivity`, `roads_traffic`, `mills`, `states`. |
 | `data/map_data.json` | The compact data behind the web map and the posters (edges, hexes with routes, mills, states, canopy raster). |
 | `data/nlcd_canopy_by_hex.csv` | Mean canopy, share of land at least 10% canopy, and valid-pixel share for each hex. |
 | `data/states_albers_km.json` | State outlines in the map projection (km), for the poster's locator map. |
-| `scripts/` | `static_map.py` (posters), `export_gpkg.py` (GeoPackage), `canopy.py` and `canopy_check.py` (NLCD), plus the data builders. |
+| `scripts/` | `static_map.py` (landscape) and `static_map_portrait.py` (portrait), `export_gpkg.py` (GeoPackage), `canopy.py` and `canopy_check.py` (NLCD), plus the data builders. |
 
 ### GeoPackage layers
 
@@ -64,7 +64,7 @@ least three hexes it varies by more than 30% around the county mean). Per-hex va
 
 ## Rebuild
 
-- Posters: `cd scripts && python static_map.py paper out canopy` (or `night`; add `nocanopy` for roads only). Needs
+- Maps: `cd scripts && python static_map.py paper out canopy` (or `night`; add `nocanopy` for roads only) for landscape, and `python static_map_portrait.py out 150` for portrait. Needs
   numpy, matplotlib, Pillow and the Candara font (falls back to Segoe UI / DejaVu Sans). Rebuilt output matches the
   published poster to within 0.05% of pixels.
 - GeoPackage: `cd scripts && python export_gpkg.py` (geopandas, shapely).

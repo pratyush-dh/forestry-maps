@@ -1,6 +1,6 @@
-"""Static map v5: the main map first, one key chart. Same data and model as the web app (NLCD canopy underlay,
-removals placed by canopy, spread 15 min, cap 120 min). Layout is in inches on a 26 x 17.6 in page.
-Inputs: ../data/map_data.json, ../data/states_albers_km.json.   Run from this folder: python static_map.py <paper|night> <out_basename> [canopy|nocanopy]"""
+"""Forest to mill: landscape static map (26 x 17.6 in). Inputs: ../data/map_data.json, ../data/states_albers_km.json.
+Run from this folder: python static_map.py <paper|night> <out_basename> [canopy|nocanopy]
+Aborts if any label crosses the map frame."""
 import json, sys, io, base64, textwrap
 import numpy as np
 import matplotlib
@@ -174,9 +174,30 @@ for i in range(5): ax.annotate(f"{i * 100}", (sx0 + i * mi, sy0 - bh - 30), xyte
 ax.annotate("mi", (sx0 + 4 * mi, sy0 - bh - 30), xytext=(22, -4), textcoords="offset points", fontsize=14.3, color=INK, va="top", zorder=12)
 ax.annotate("Albers equal-area; scale varies ±1.5% across the sheet", (sx0, sy0 - bh - 30), xytext=(0, -30), textcoords="offset points", fontsize=12.3, color=MUT, va="top", zorder=12)
 nx0, ny0 = 1790, -820
-ax.add_patch(MPoly([[nx0, ny0 + 120], [nx0 - 30, ny0 - 10], [nx0, ny0 + 15], [nx0 + 30, ny0 - 10]], fc=INK, ec=INK, zorder=12))
-ax.annotate("N", (nx0, ny0 + 120), xytext=(0, 5), textcoords="offset points", fontsize=24.7, weight="bold", ha="center", va="bottom", color=INK, zorder=12)
-ax.annotate("true north at 96°W;\nmeridians converge", (nx0, ny0 - 10), xytext=(0, -6), textcoords="offset points", fontsize=12.3, ha="center", va="top", color=MUT, zorder=12)
+_arrow = ax.add_patch(MPoly([[nx0, ny0 + 120], [nx0 - 30, ny0 - 10], [nx0, ny0 + 15], [nx0 + 30, ny0 - 10]], fc=INK, ec=INK, zorder=12))
+_n1 = ax.annotate("N", (nx0, ny0 + 120), xytext=(0, 5), textcoords="offset points", fontsize=24.7, weight="bold", ha="center", va="bottom", color=INK, zorder=12)
+_n2 = ax.annotate("true north at 96°W;\nmeridians converge", (nx0, ny0 - 10), xytext=(0, -6), textcoords="offset points", fontsize=12.3, ha="center", va="top", color=MUT, zorder=12)
+
+# ---- keep the north arrow and its note fully inside the map frame, then verify that no label crosses the frame line
+def _fit_north(arrow, n1, n2, pad_px=16):
+    fig.canvas.draw(); r_ = fig.canvas.get_renderer(); axb = ax.get_window_extent(r_)
+    for _ in range(4):
+        over = max(n1.get_window_extent(r_).x1, n2.get_window_extent(r_).x1) - (axb.x1 - pad_px)
+        if over <= 0: break
+        dx = over * (xmax - xmin) / axb.width
+        arrow.set_xy(arrow.get_xy() - np.array([dx, 0]))
+        for n_ in (n1, n2): n_.xy = (n_.xy[0] - dx, n_.xy[1])
+        fig.canvas.draw()
+def _check_frame():
+    r_ = fig.canvas.get_renderer(); axb = ax.get_window_extent(r_); bad = []
+    for t_ in ax.texts:
+        bb = t_.get_window_extent(r_)
+        inter = not (bb.x1 < axb.x0 or bb.x0 > axb.x1 or bb.y1 < axb.y0 or bb.y0 > axb.y1)
+        inside = bb.x0 >= axb.x0 - 1 and bb.x1 <= axb.x1 + 1 and bb.y0 >= axb.y0 - 1 and bb.y1 <= axb.y1 + 1
+        if inter and not inside: bad.append(t_.get_text().replace(chr(10), " ")[:40])
+    print("labels crossing the map frame:", bad if bad else "none")
+    return bad
+_fit_north(_arrow, _n1, _n2)
 
 # ------------------------------------------------------------------ right column: locator, key figures, ONE chart, notes
 LH, LW = 2.4, 3.9
@@ -260,5 +281,7 @@ src = ("Data: USDA Forest Service FIA county estimates (annual removals, forest 
        "US Census state and county boundaries via us-atlas; author-compiled mill list (Forisk / PPRC 2025, company announcements, trade press).  Projection: spherical Albers equal-area conic "
        "(standard parallels 29.5°N and 45.5°N, origin 37.5°N 96°W, R = 6,371,008.8 m).")
 T(X0, .95, "\n".join(textwrap.wrap(src, 215)), fontsize=13, color=MUT, va="top", linespacing=1.3)
+_bad = _check_frame()
+assert not _bad, _bad
 fig.savefig(f"{OUT}.png", dpi=170, facecolor=PAL["page"]); fig.savefig(f"{OUT}.pdf", facecolor=PAL["page"])
 print("saved", OUT, "| top segment", round(load.max()), "| median", med, "| reached", round(reached / tot * 100, 1), "| mills", n_recv)
