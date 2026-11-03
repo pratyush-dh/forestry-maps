@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Forest to mill</title>
-<meta name="description" content="Modelled wood-haul traffic from FIA forest removals to 117 mills across 13 southern states.">
+<meta name="description" content="Modelled wood-haul traffic from FIA forest removals to 117 open wood mills across the lower 48 states.">
 <style>
 :root{
   --ink:#111;--mut:#6a6a6a;--rule:#dcdcdc;--bg:#fff;--body:#333;--acc:#d9531e;--map:#e4e9e8;--lkbg:#f9f6ec;--lk-state:#5c5642;--lk-nbr:#8f876f;--lk-wat:#4f7a96;--lk-mill:#23201a;--lk-traf:#c2331f;--lk-tag:#fff;
@@ -141,9 +141,9 @@ figcaption[data-act=expand]{cursor:zoom-in}
 <body>
 <div class="wrap">
 <header class="top">
-  <p class="kicker">Day 2 &middot; 30 Days 30 Maps</p>
+  <p class="kicker">Forest products &middot; road network</p>
   <h1>Forest to mill</h1>
-  <p class="dek">Where wood moves by road in the southern United States: modelled haul traffic from FIA forest removals to 117 mills, Oklahoma and Texas to Virginia. A model, not a traffic count.</p>
+  <p class="dek">Where wood moves by road across the lower 48 states: modelled haul traffic from FIA forest removals to 117 open wood mills. A model, not a traffic count, and the mill list is a sample.</p>
 </header>
 
 <main class="app" id="app">
@@ -187,8 +187,7 @@ figcaption[data-act=expand]{cursor:zoom-in}
       <div class="legend" id="legend"></div></section>
     <section class="blk"><h2>Label types</h2>
       <div class="legend">
-        <span><b class="lk" style="letter-spacing:.22em;font-weight:700">OKLAHOMA</b>Study state</span>
-        <span><em class="lk" style="color:var(--lk-nbr)">Missouri</em>Neighbouring state</span>
+        <span><b class="lk" style="letter-spacing:.22em;font-weight:700">OKLAHOMA</b>State</span>
         <span><em class="lk" style="color:var(--lk-wat);letter-spacing:.14em">Gulf</em>Water body</span>
         <span><b class="lk" style="color:var(--lk-mill)">Macon</b>Largest mills are named</span>
         <span><b class="lk"><span style="background:var(--lk-traf);color:var(--lk-tag);padding:1px 6px;border-radius:3px">257</span></b>Busiest road segments, million ft³/yr</span>
@@ -202,7 +201,7 @@ figcaption[data-act=expand]{cursor:zoom-in}
     <section class="blk"><h2>Read before citing</h2>
       <details><summary>How the traffic is built</summary><p>Each forest hex (842 km&sup2;) sends its FIA removals to every mill within the haul cap, weighted by travel time: a mill as many minutes farther than the nearest as the spread setting receives about 37% of the nearest mill&rsquo;s share. Spread zero means the nearest mill only, the original model. Road thickness is the wood summed over every route crossing a segment; each haul counts once, and the empty return uses the same road.</p></details>
       <details><summary>What &ldquo;forest&rdquo; means here</summary><p>FIA forest land is land at least 10% stocked with trees, at least 1 acre and 120 ft wide; it excludes urban and farm trees. FIA reports county totals, so every hex takes its county&rsquo;s share, and where dots fall inside a hex is illustrative. Each dot is about 19&nbsp;km&sup2; of forest. Hexes under 20% forest are drawn but not treated as wood sources.</p><p>The grey-green underlay is the USFS NLCD tree canopy cover (percent of each 30&nbsp;m pixel under tree crowns, v2025-6), averaged to 2&nbsp;km, for 2021. It is a satellite-modelled measure and is not the FIA definition of forest: it includes street and yard trees and can miss open woodland. FIA gives only county totals, so you can place each county&rsquo;s removals evenly across its hexes or in proportion to canopy; county totals are the same either way.</p></details>
-      <details><summary>Limits of the data</summary><p>Mills are a 117-mill sample with no recorded closure, so empty areas (Texas, Oklahoma, Kentucky) show missing mills as much as distance. Roads are Natural Earth 1:10m major roads; speeds of 48&ndash;80 km/h and 1.10 circuity are assumed. Mill capacity and species are ignored, and there are no truck-route or weight limits.</p></details>
+      <details><summary>Limits of the data</summary><p>Mills are a sample of 117 open mills; closed, idled and unknown-status mills are left out. An empty area, such as much of the West, California and the Northeast, shows missing mills as much as distance. Roads are Natural Earth 1:10m major roads; speeds of 48&ndash;80 km/h and 1.10 circuity are assumed. Mill capacity and species are ignored, and there are no truck-route or weight limits.</p></details>
     </section>
   </aside>
 </main>
@@ -227,7 +226,7 @@ const ex1=i=>C16[4*i]/10,ey1=i=>C16[4*i+1]/10,ex2=i=>C16[4*i+2]/10,ey2=i=>C16[4*
 const HX=D.hexes.map(r=>({id:r[0],x:r[1],y:r[2],county:r[3],st:r[4],rem:r[5],ff:r[6],km2:r[7],forest:!!r[8],routes:r[9],canopy:r[10],remE:r[5],remC:r[11]}));
 const M=D.mills.map(m=>({i:m[0],id:m[1],name:m[2],co:m[3],st:m[4],type:m[5],x:m[6],y:m[7],nx:m[8],ny:m[9]}));
 const mIdx={};M.forEach((m,i)=>mIdx[m.i]=i);
-const STN={40:"Oklahoma",48:"Texas",5:"Arkansas",22:"Louisiana",28:"Mississippi",1:"Alabama",47:"Tennessee",21:"Kentucky",13:"Georgia",12:"Florida",45:"South Carolina",37:"North Carolina",51:"Virginia"};
+const STN={};for(const k in D.stn)STN[+k]=D.stn[k];
 const PAL={
  dark:{bg:"#000",land:"#0b0b0b",study:"#141414",stS:"#a6a6a6",stO:"#303030",road:"#5c5c5c",traf:"#ffa21a",forest:["#46604d","#58796a","#78997a"],mill:"#fff",r0:"#fff",r1:"#4dd0e1",nbr:"#7a7a7a",wat:"#6f93a8",grat:"#262626",halo:"#000",lab:"rgba(220,220,220,.8)",casing:"rgba(0,0,0,.9)",veil:"rgba(0,0,0,.66)",route:"rgba(255,255,255,.5)",spot:"rgba(255,255,255,.45)",tag:"#1a1000",fg:"#fff",can:[118,158,124],cana:.66,tcol:["#4a4a4a","#7e7e7e","#b4b4b4","#f0f0f0"],none:"#262626"},
  light:{bg:"#e4e9e8",land:"#f9f6ec",study:"#fcfaf2",stS:"#857d66",stO:"#b3ab94",road:"#8f8468",traf:"#c2331f",forest:["#6f9a78","#86ac7a","#a7c48f"],mill:"#23201a",r0:"#23201a",r1:"#1b6d8a",nbr:"#8f876f",wat:"#4f7a96",grat:"#9d957f",halo:"#f9f6ec",lab:"#5c5642",casing:"rgba(249,246,236,.9)",veil:"rgba(255,255,255,.62)",route:"rgba(35,32,26,.5)",spot:"rgba(35,32,26,.45)",tag:"#fff",fg:"#23201a",can:[78,128,92],cana:.48,tcol:["#d9d9d9","#a3a3a3","#5e5e5e","#111"],none:"#f1f1f1"}};
@@ -436,13 +435,13 @@ function charts(){const s=stats(),tot=s.tot,hl=highlights();let out="";
   out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>A &nbsp;Haul time to the nearest mill</b><span>Bars: % of removals per 10 minutes (left axis). Line: cumulative % (right axis). Pick a bar to see those patches.</span></figcaption>'+g+'</figure>'}
  /* B: by state */
  {const sd={};for(const h of s.F){const a=sd[h.st]||(sd[h.st]=[0,0,0,0,0]);a[nearestClass(h)]+=h.rem||0}
-  const ord=Object.keys(sd).sort((a,b)=>sd[b].reduce((x,y)=>x+y)-sd[a].reduce((x,y)=>x+y)),mx=Math.max(...ord.map(q=>sd[q].reduce((x,y)=>x+y))),w=360,rh=18,pl=96,pr=60,h=ord.length*rh+34;
+  const ord=Object.keys(sd).filter(q=>sd[q].reduce((x,y)=>x+y)>0).sort((a,b)=>sd[b].reduce((x,y)=>x+y)-sd[a].reduce((x,y)=>x+y)).slice(0,15),mx=Math.max(...ord.map(q=>sd[q].reduce((x,y)=>x+y))),w=360,rh=18,pl=96,pr=60,h=ord.length*rh+34;
   let g=svgOpen(w,h);ord.forEach((st,i)=>{const y=i*rh+2,tt=sd[st].reduce((a,b)=>a+b);
    g+='<text data-act="Bs" data-st="'+st+'" tabindex="0" role="button" x="'+(pl-6)+'" y="'+(y+12)+'" text-anchor="end" font-size="12" fill="#111" font-weight="'+(hl.B.has(st)?700:400)+'" opacity="'+op(hl.B,st)+'">'+STN[st]+'</text>';let x=pl;
    sd[st].forEach((v,ci)=>{const bw=v/mx*(w-pl-pr);g+='<rect data-act="Bc" data-st="'+st+'" data-ci="'+ci+'" tabindex="0" role="button" x="'+x+'" y="'+y+'" width="'+Math.max(0,bw)+'" height="'+(rh-4)+'" fill="'+(ci<4?TCOL[ci]:NONE)+'"'+(ci===4?' stroke="#ddd" stroke-width=".6"':'')+' opacity="'+op(hl.B,st,st+":"+ci)+'"/>';x+=bw});
    g+='<text x="'+(x+5)+'" y="'+(y+12)+'" font-size="11" fill="#6a6a6a" opacity="'+op(hl.B,st)+'" pointer-events="none">'+Math.round((1-sd[st][4]/tt)*100)+'% reached</text>'});
   const ly=h-12;["0–30","30–60","60–90","90–120","none"].forEach((l,i)=>{const x=pl+i*52;g+='<rect x="'+x+'" y="'+(ly-8)+'" width="9" height="9" fill="'+(i<4?TCOL[i]:NONE)+'"'+(i===4?' stroke="#ccc" stroke-width=".6"':'')+'/><text x="'+(x+13)+'" y="'+ly+'" font-size="10.5" fill="#6a6a6a">'+l+'</text>'});
-  g+='</svg>';out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>B &nbsp;How far is each state&rsquo;s wood from a mill?</b><span>Removals by minutes to the nearest sample mill, million ft³ a year. Pick a state, or one segment of a bar.</span></figcaption>'+g+'</figure>'}
+  g+='</svg>';out+='<figure><figcaption data-act="expand" title="Click to enlarge">'+EXP+'<b>B &nbsp;How far is each state&rsquo;s wood from a mill?</b><span>The 15 states with the most removals, by minutes to the nearest sample mill, million ft³ a year. Pick a state, or one segment of a bar.</span></figcaption>'+g+'</figure>'}
  /* C: busiest mills */
  {const top=topMills(10),mx=mload[top[0]]||1,w=360,rh=20,pl=134,pr=36,h=top.length*rh+8;let g=svgOpen(w,h);
   top.forEach((i,j)=>{const m=M[i],y=j*rh+2,bw=mload[i]/mx*(w-pl-pr);g+='<g data-act="C" data-i="'+i+'" tabindex="0" role="button" aria-label="'+m.name+'" opacity="'+op(hl.C,i)+'"><rect x="0" y="'+y+'" width="'+w+'" height="'+(rh-2)+'" fill="transparent"/><text x="'+(pl-6)+'" y="'+(y+13)+'" text-anchor="end" font-size="12" fill="#111">'+(m.name.length>19?m.name.slice(0,18)+"…":m.name)+' '+m.st+'</text><rect x="'+pl+'" y="'+y+'" width="'+bw+'" height="'+(rh-5)+'" fill="'+(TYPEC[m.type]||"#999")+'"/><text x="'+(pl+bw+5)+'" y="'+(y+13)+'" font-size="11" fill="#6a6a6a">'+mload[i].toFixed(0)+'</text></g>'});
@@ -517,7 +516,7 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 function legend(){const ws=[1,10,50,150].map(v=>'<span><i class="l" style="height:'+Math.max(1,wOf(v)).toFixed(1)+'px"></i>'+v+' million ft³/yr</span>').join("");
  const cnt={};M.forEach(m=>cnt[m.type]=(cnt[m.type]||0)+1);
  const mt=Object.keys(MILL_LABEL).filter(t=>cnt[t]).map(t=>'<span><svg class="ms" width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true"><path d="'+shapeD(t,0,0,6)+'"/></svg>'+MILL_LABEL[t]+' ('+cnt[t]+')</span>').join("");
- $("#legend").innerHTML=ws+'<span style="display:block;margin-top:4px;font-weight:700;color:var(--ink)">Mill type, sample mills with no closure recorded</span><div class="mtypes">'+mt+'</div><span><i style="display:inline-block;width:9px;height:9px;background:'+C.forest[1]+';border-radius:50%;margin:0 10.5px"></i>FIA forest dots (optional), about 19 km² each</span><span><i style="display:inline-block;width:30px;height:10px;background:linear-gradient(90deg,'+(theme==="dark"?"#000":"#fcfaf2")+',rgb('+C.can.join(",")+'));margin:0 0;border:1px solid var(--rule)"></i>Tree canopy cover, NLCD '+D.can.year+', 0 to 100%</span>'}
+ $("#legend").innerHTML=ws+'<span style="display:block;margin-top:4px;font-weight:700;color:var(--ink)">Mill type (open mills in the sample)</span><div class="mtypes">'+mt+'</div><span><i style="display:inline-block;width:9px;height:9px;background:'+C.forest[1]+';border-radius:50%;margin:0 10.5px"></i>FIA forest dots (optional), about 19 km² each</span><span><i style="display:inline-block;width:30px;height:10px;background:linear-gradient(90deg,'+(theme==="dark"?"#000":"#fcfaf2")+',rgb('+C.can.join(",")+'));margin:0 0;border:1px solid var(--rule)"></i>Tree canopy cover, NLCD '+D.can.year+', 0 to 100%</span>'}
 function update(){applyRem();recompute();if(foc)applyFocus();figs();charts();selUI();baseDirty=true;draw();
  $("#spn").textContent=spread===0?"Nearest mill only: the package's original model.":"A patch splits its wood across every mill in reach, weighted by e^(−extra minutes ÷ "+spread+"). A mill "+spread+" min farther than the nearest gets about 37% of its share."}
 $("#cap").oninput=e=>{cap=+e.target.value;$("#capv").textContent=cap+" min";update()};

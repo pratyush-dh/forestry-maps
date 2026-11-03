@@ -1,12 +1,15 @@
 # Forest to mill
 
-Day 2 of 30 Days 30 Maps. Where wood moves by road in the southern United States: modelled haul traffic from FIA
-forest removals to 117 wood mills, 13 states from Oklahoma and Texas to Virginia. **A model, not a traffic count.**
+Where wood moves by road across the lower 48 states: modelled haul traffic from FIA forest removals to 117 open wood
+mills. **A model, not a traffic count, and the mill list is a sample.**
 
 - **Live web map:** https://pratyush-dh.github.io/forestry-maps/forest-to-mill/
 - **Static maps:** [`static-map/`](static-map/) (paper and night, PNG and vector PDF)
 - **GIS data:** [`data/south_connectivity.gpkg`](data/south_connectivity.gpkg) (QGIS / ArcGIS)
-- Follows Day 1: [`wood-mills`](../wood-mills/), the mill sample used here.
+- Mill sample: from [`wood-mills`](../wood-mills/).
+
+Scope: the web map covers the whole lower 48. The static maps and the GeoPackage are a close-up of the 13 southern states
+(Oklahoma and Texas to Virginia), where the open mills are densest.
 
 ## What the map shows
 
@@ -37,18 +40,19 @@ to it with a spotlight. Every graph has an Enlarge button. Mills are drawn as a 
 The underlay is USFS NLCD Tree Canopy Cover (TCC v2025-6, 2021 slice, 30 m, percent of each pixel under tree crowns),
 fetched from the GeoPlatform ImageServer and averaged to 1 km and 2 km (`scripts/canopy.py`). **It is not the FIA
 definition of forest**: it includes street and yard trees and can miss open woodland. Against FIA's county forest share it
-agrees well (Spearman 0.80 across the 2,628 study hexes), and it varies a lot inside counties (in 39% of counties with at
+agrees well (Spearman 0.80 across the 2,628 hexes of the southern extract), and it varies a lot inside counties (in 39% of counties with at
 least three hexes it varies by more than 30% around the county mean). Per-hex values: [`data/nlcd_canopy_by_hex.csv`](data/nlcd_canopy_by_hex.csv).
 
 ## Files
 
 | Path | What |
 |---|---|
-| `index.html` | The web map, one self-contained file (about 1.5 MB, data inline). |
+| `index.html` | The web map for the lower 48, one self-contained file (about 3 MB, data inline). |
 | `static-map/` | Print-style maps, landscape (paper and night) and portrait 4:5: main map, scale bar, graticule, north arrow, locator, one key chart, legend. |
 | `data/south_connectivity.gpkg` | GeoPackage, custom spherical Albers (metres): `hex_forest_connectivity`, `roads_traffic`, `mills`, `states`. |
-| `data/map_data.json` | The compact data behind the web map and the posters (edges, hexes with routes, mills, states, canopy raster). |
-| `data/nlcd_canopy_by_hex.csv` | Mean canopy, share of land at least 10% canopy, and valid-pixel share for each hex. |
+| `data/map_data.json` | The compact southern-extract data behind the static maps (edges, hexes with routes, mills, states, canopy raster). |
+| `data/nlcd_canopy_by_hex.csv` | Mean canopy, share of land at least 10% canopy, and valid-pixel share for each hex of the southern extract. |
+| `data/nlcd_canopy_by_hex_conus.csv` | The same for all 9,694 lower-48 hexes (the web map). |
 | `data/states_albers_km.json` | State outlines in the map projection (km), for the poster's locator map. |
 | `scripts/` | `static_map.py` (landscape) and `static_map_portrait.py` (portrait), `export_gpkg.py` (GeoPackage), `canopy.py` and `canopy_check.py` (NLCD), plus the data builders. |
 
@@ -70,13 +74,16 @@ least three hexes it varies by more than 30% around the county mean). Per-hex va
 - GeoPackage: `cd scripts && python export_gpkg.py` (geopandas, shapely).
 - Canopy: `python canopy.py` re-fetches the tiles (needs rasterio and a network connection); `canopy_check.py` compares
   canopy with FIA county shares.
-- `build_app_data.py` and `build_app_data2.py` produce `map_data.json` from the Day 2 package (hexes, edges, routes) and the
-  canopy outputs; those inputs are not republished here, so they are included for provenance.
+- Web map: `canopy_nat.py` fetches the national canopy, then `build_national.py` routes every forest hex to every open mill
+  within 120 minutes and writes the data that `app_template.html` embeds. It reproduces the package's own result (99.9% of hexes
+  agree on whether they are within reach, 98% on the nearest mill). `build_app_data.py` and `build_app_data2.py` build the
+  southern-extract `map_data.json`. The input package is not republished here, so these scripts are included for provenance.
 
 ## Read before citing
 
-- The 117 mills are a sample with no recorded closure, not an official registry and not confirmed operating. Empty areas
-  (Texas, Oklahoma, Kentucky) show missing mills as much as distance.
+- The 117 mills are the open ones (status open, partial or reopened) in a sample compiled from public sources, not an official
+  registry. Closed, idled and unknown-status mills are left out. An empty area, such as much of the West, California and the
+  Northeast, shows missing mills as much as distance.
 - Roads are major roads only; speeds, the 1.10 circuity factor and the 2-hour cap are assumptions. Mill capacity,
   species and product mix are ignored, and there are no truck-route, weight or bridge limits.
 - Volumes are county totals apportioned to hexes (by canopy or evenly), not measured at that location.
