@@ -16,7 +16,7 @@ segment. Each haul is counted once; the empty return uses the same road, so the 
 
 In the web map you can change the haul cap, the spread to farther mills (0 = nearest mill only), and where a county's
 removals fall (by tree canopy, or evenly). Click a forest patch or a mill, or pick a bar in a chart, and the map zooms
-to it with a spotlight. Every graph has an Enlarge button. Deep links: `#hex=<id>`, `#mill=<id>`, `#top=3`, `#state=<fips>`,
+to it with a spotlight. Every graph has an Enlarge button. Mills are drawn as a different shape for each type (pulp, sawmill, OSB, plywood, MDF, paper), and a Light / Dark switch changes the page and map together. Deep links: `#hex=<id>`, `#mill=<id>`, `#top=3`, `#state=<fips>`,
 `#bin=<n>`, `#reach=<n>`.
 
 ## Method in brief
