@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nearest mill, two ways</title>
+<meta name="description" content="Which wood mill is nearest? Voronoi catchments of 116 open U.S. wood-mill sites by straight-line distance and by road time, coloured by the forest removals inside each polygon.">
+<style>
+:root{--ink:#1c1c1c;--mut:#555;--rule:#dcdcdc;--bg:#fff;--acc:#c2331f;--card:#f6f6f4;--font:Candara,"Segoe UI",system-ui,-apple-system,sans-serif}
+html[data-theme=dark]{color-scheme:dark;--ink:#ececec;--mut:#a8a8a8;--rule:#2e2e2e;--bg:#121212;--acc:#ff8a73;--card:#1b1b1b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--font);-webkit-text-size-adjust:100%}
+a{color:inherit}
+.app{display:grid;grid-template-columns:1fr;min-height:100svh}
+header{padding:14px 16px 6px}
+.kicker{color:var(--acc);font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:.78rem;margin:0 0 2px}
+h1{font-size:clamp(1.45rem,5vw,2.3rem);line-height:1.15;margin:0 0 6px}
+.dek{color:var(--mut);margin:0;max-width:70ch;font-size:.97rem}
+.mapcol{position:sticky;top:0;z-index:20;background:var(--bg);padding:6px 0 0}
+#mapwrap{position:relative;height:var(--maph,46svh);min-height:260px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);background:#e6edf0;touch-action:none;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+#cv:active{cursor:grabbing}
+.zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.zoom button,.small{border:1px solid var(--ink);background:var(--bg);color:var(--ink);font:700 1rem var(--font);width:38px;height:38px;border-radius:8px;cursor:pointer;opacity:.94}
+.small{width:auto;height:auto;padding:5px 11px;font-size:.82rem;border-radius:999px}
+#hint{position:absolute;left:8px;bottom:8px;background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:4px 9px;font-size:.8rem;color:var(--mut);pointer-events:none}
+.panel{padding:12px 16px 40px;max-width:760px}
+.seg{display:flex;margin:4px 0 10px}
+.seg button{flex:1;border:1px solid var(--ink);background:var(--bg);color:var(--ink);font:600 .86rem var(--font);padding:9px 6px;cursor:pointer;min-height:40px}
+.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}.seg button+button{border-left:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+h2{font-size:1rem;margin:18px 0 6px;letter-spacing:.02em;text-transform:uppercase}
+.lbl{font-size:.8rem;color:var(--mut);margin:8px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.legend{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;font-size:.95rem}
+.sw{width:30px;height:18px;border:1px solid var(--ink);border-radius:3px}
+.cnt{color:var(--mut);font-variant-numeric:tabular-nums}
+.keys{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;margin-top:6px}
+.keys span{display:inline-flex;align-items:center;gap:6px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;margin:10px 0}
+.card h3{margin:0 0 2px;font-size:1.15rem}
+.card .sub{color:var(--mut);font-size:.9rem;margin:0 0 8px}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{padding:4px 6px;text-align:right;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:600;font-size:.8rem}
+.list{list-style:none;margin:0;padding:0}
+.list li button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:8px 2px;font:inherit;color:inherit;cursor:pointer}
+.list li button:hover{background:var(--card)}
+.up{color:#1f8a57}.dn{color:var(--acc)}
+select{font:inherit;padding:8px;border:1px solid var(--ink);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+.note{color:var(--mut);font-size:.9rem}
+details{margin:8px 0}summary{cursor:pointer;font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+footer{padding:0 16px 24px;color:var(--mut);font-size:.85rem}
+@media(min-width:900px){
+ .app{grid-template-columns:minmax(0,1fr) 410px;grid-template-rows:auto 1fr;height:100svh}
+ header{grid-column:1 / 3}
+ .mapcol{position:static;grid-row:2;padding:0 0 0 16px;display:flex}
+ #mapwrap{height:auto;flex:1;border:1px solid var(--ink)}
+ .panel{grid-row:2;grid-column:2;overflow:auto;padding:0 16px 24px}
+ footer{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <p class="kicker">Forest products &middot; polygons</p>
+ <h1>Nearest mill, two ways</h1>
+ <p class="dek">Which wood mill is nearest to a forest? By straight line it is a Voronoi polygon; by road it follows the network. Each polygon is coloured by the forest wood removed inside it. A model, not a traffic count, and the 117 mills are a sample.</p>
+</header>
+<div class="mapcol"><div id="mapwrap"><canvas id="cv" role="img" aria-label="Map of the lower 48 states divided into polygons, one per wood mill, shaded by wood removed per square kilometre."></canvas>
+ <div class="zoom"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button><button id="zreset" aria-label="Show the whole map" style="font-size:.8rem">All</button></div>
+ <div id="hint">Drag, pinch or scroll to zoom. Tap a polygon or a mill.</div></div></div>
+<div class="panel">
+ <div class="lbl">Nearest mill by</div>
+ <div class="seg" id="modeSeg"><button data-v="S" aria-pressed="true">Straight line</button><button data-v="R" aria-pressed="false">Road time</button><button data-v="B" aria-pressed="false">Compare</button></div>
+ <div class="lbl">Colour polygons by</div>
+ <div class="seg" id="varSeg"><button data-v="dens" aria-pressed="true">Wood per km&sup2;</button><button data-v="sup" aria-pressed="false">Wood inside</button><button data-v="area" aria-pressed="false">Area</button></div>
+ <div class="row"><button class="small" id="themeBtn">Dark map</button><button class="small" id="labelBtn" aria-pressed="true">Labels on</button></div>
+
+ <h2 id="legTitle">Wood per km&sup2;</h2>
+ <p class="note" id="legNote"></p>
+ <div class="legend" id="legend"></div>
+ <div class="keys" id="keys"></div>
+ <p class="note" id="cmpNote" style="display:none">Compare: polygons are the road-time ones; dashed lines are the straight-line polygons.</p>
+
+ <h2>Find a mill</h2>
+ <select id="millSel" aria-label="Find a mill"><option value="">Choose a mill or tap the map&hellip;</option></select>
+ <div id="card"></div>
+
+ <h2>What changes on the road</h2>
+ <p class="note" id="facts"></p>
+ <div class="lbl">Gain the most wood by road</div><ul class="list" id="gain"></ul>
+ <div class="lbl">Lose the most wood by road</div><ul class="list" id="lose"></ul>
+
+ <h2>Read before using</h2>
+ <p class="note">Road time uses the major-road network from the Forest to Mill map, with off-road legs at 40 km/h (a hex may also go straight across country when that is faster), and has no 120-minute limit here, so it can differ from the Forest to Mill allocation. Colour is the wood removed from forests inside the polygon, averaged over all of its land, so it is not the density at any one place. The mills are a sample of open mills, so large western polygons show missing mills as much as empty forest. Removals are FIA county totals shared evenly among forest hexes of 842 km&sup2; and include land clearing, so road-time edges are accurate to about one hex and are smoothed over about 20 km for display; two mills (Fernandina Beach containerboard and Woodland) sit just outside their own road-time polygon for that reason. Two Camas, Washington, mills share one point and one polygon.</p>
+ <p class="note"><a href="poster.html">Print-size poster (PDF and PNG)</a> &middot; <a href="https://pratyush-dh.github.io/forestry-maps/forest-to-mill/">Forest to Mill road-traffic map</a> &middot; <a href="README.md">Method</a></p>
+</div>
+</div>
+<footer>FIA annual removals by county; open wood mills (sample); Natural Earth states. Albers equal-area.</footer>
+<script>
+"use strict";
+const D=__DATA__;
+const $=s=>document.querySelector(s);
+const MLAB={pulp:"Pulp mill",sawmill:"Sawmill",osb:"OSB mill",plywood:"Plywood mill",mdf:"MDF mill",paper:"Paper mill"};
+const S=D.sites.map((r,i)=>({i,name:r[0],co:r[1],st:r[2],type:r[3],x:r[4],y:r[5],n:r[6],aS:r[7],sS:r[8],dS:r[9],aR:r[10],sR:r[11],dR:r[12],alloc:r[13],kept:r[14],min:r[15],id:r[16]}));
+const nf=(v,d=0)=>v==null||isNaN(v)?"n/a":v.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
+/* ---- paths in data coordinates (km) ---- */
+const mkPath=rings=>{const p=new Path2D();for(const r of rings){for(let i=0;i<r.length;i+=2){const x=r[i]/10,y=r[i+1]/10;i?p.lineTo(x,y):p.moveTo(x,y)}p.closePath()}return p};
+const PS=D.cS.map(mkPath),PR=D.cR.map(mkPath);
+const boxOf=rings=>{let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const r of rings)for(let i=0;i<r.length;i+=2){const x=r[i]/10,y=r[i+1]/10;if(x<a)a=x;if(x>b)b=x;if(y<c)c=y;if(y>d)d=y}return[a,b,c,d]};
+const BS=D.cS.map(boxOf),BR=D.cR.map(boxOf);
+const stP=D.states.map(s=>{const p=new Path2D();for(const r of s[3]){r.forEach((q,i)=>i?p.lineTo(q[0],q[1]):p.moveTo(q[0],q[1]));p.closePath()}return p});
+/* ---- state ---- */
+const st={mode:"S",v:"dens",sel:-1,labels:true,theme:"light"};
+const PAL={light:{bg:"#fff",water:"#e6edf0",ink:"#1c1c1c",mut:"#4a4a4a",state:"rgba(91,91,91,.5)",edge:"rgba(28,28,28,.72)",dash:"#c2331f",grat:"rgba(125,125,125,.7)",halo:"rgba(255,255,255,.88)",cls:["#cfe5a6","#94cd7e","#53b06c","#1f8a57","#095a3a"],mill:"#1c1c1c",millHalo:"#fff",sel:"#c2331f",wlab:"#4d7a95"},
+ dark:{bg:"#121212",water:"#0b1115",ink:"#ececec",mut:"#b0b0b0",state:"rgba(200,200,200,.34)",edge:"rgba(235,235,235,.6)",dash:"#ff8a73",grat:"rgba(160,160,160,.35)",halo:"rgba(0,0,0,.8)",cls:["#1d3b2d","#276249","#2f8a5f","#76c277","#cdee8e"],mill:"#f4f4f4",millHalo:"#000",sel:"#ff8a73",wlab:"#6f93a8"}};
+let C=PAL.light;
+/* ---- variables and classes (quintiles of the straight-line and road-time values pooled, so the two modes share one legend) ---- */
+const VAR={dens:{k:["dS","dR"],t:"Wood per km²",u:"thousand ft³ per km² per year",note:"Annual FIA forest removals inside the polygon divided by its area.",d:1},
+ sup:{k:["sS","sR"],t:"Wood inside",u:"million ft³ per year",note:"Annual FIA forest removals inside the polygon, in total.",d:0},
+ area:{k:["aS","aR"],t:"Area",u:"thousand km²",note:"Area of the polygon.",d:0,div:1000}};
+const BRK={};
+for(const key in VAR){const v=VAR[key],dv=v.div||1,a=[];S.forEach(s=>{a.push(s[v.k[0]]/dv);a.push(s[v.k[1]]/dv)});a.sort((p,q)=>p-q);
+ const q=f=>a[Math.min(a.length-1,Math.round(f*(a.length-1)))];const dd=v.d;const r=x=>Math.round(x*10**dd)/10**dd;BRK[key]=[0,.2,.4,.6,.8,1].map((f,i)=>i===0?0:i===5?Math.ceil(a[a.length-1]*10**dd)/10**dd:r(q(f)))}
+const val=(s,m=st.mode)=>{const v=VAR[st.v];return s[v.k[m==="S"?0:1]]/(v.div||1)};
+const cls=x=>{const b=BRK[st.v];let c=0;for(let i=1;i<5;i++)if(x>=b[i])c=i;return c};
+const modeKey=()=>st.mode==="S"?"S":"R";
+/* ---- view ---- */
+const wrap=$("#mapwrap"),cv=$("#cv"),ctx=cv.getContext("2d"),base=document.createElement("canvas"),probe=document.createElement("canvas").getContext("2d");
+let W=0,H=0,dpr=1,k=1,ox=0,oy=0,fitK=1,baseT=null,baseDirty=true,gesturing=false,touched=false,rb=null,anim=0;
+const BX=[-2420,2330,-1420,1640];
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+function boxView(x0,x1,y0,y1,fill=.92){const nk=Math.min(W/(x1-x0),H/(y1-y0))*fill;return{k:nk,ox:W/2-nk*(x0+x1)/2,oy:H/2+nk*(y0+y1)/2}}
+function fit(){const v=boxView(-2380,2290,-1380,1600,.98);fitK=v.k;k=v.k;ox=v.ox;oy=v.oy}
+function resize(){cancelAnimationFrame(anim);gesturing=false;const r=wrap.getBoundingClientRect();W=Math.max(1,r.width);H=Math.max(1,r.height);dpr=Math.min(window.devicePixelRatio||1,2.5);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+ fitK=boxView(-2380,2290,-1380,1600,.98).k;if(!touched)fit();baseDirty=true;draw()}
+function flyTo(v,dur=520){cancelAnimationFrame(anim);touched=true;if(reduce||!W){k=v.k;ox=v.ox;oy=v.oy;baseDirty=true;draw();return}
+ const k0=k,c0x=(W/2-ox)/k,c0y=(oy-H/2)/k,c1x=(W/2-v.ox)/v.k,c1y=(v.oy-H/2)/v.k,t0=performance.now();gesturing=true;
+ const step=t=>{let p=Math.min(1,(t-t0)/dur);p=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;k=k0*Math.pow(v.k/k0,p);const cx=c0x+(c1x-c0x)*p,cy=c0y+(c1y-c0y)*p;ox=W/2-k*cx;oy=H/2+k*cy;draw();
+  if(t-t0<dur)anim=requestAnimationFrame(step);else{k=v.k;ox=v.ox;oy=v.oy;gesturing=false;baseDirty=true;draw()}};anim=requestAnimationFrame(step)}
+/* ---- drawing ---- */
+function shape(c,type,x,y,r){c.beginPath();
+ if(type==="pulp")c.arc(x,y,r,0,7);
+ else if(type==="sawmill"){c.moveTo(x,y-r*1.15);c.lineTo(x+r*1.05,y+r*.8);c.lineTo(x-r*1.05,y+r*.8);c.closePath()}
+ else if(type==="osb"){c.rect(x-r*.9,y-r*.9,r*1.8,r*1.8)}
+ else if(type==="plywood"){c.moveTo(x,y-r*1.2);c.lineTo(x+r*1.2,y);c.lineTo(x,y+r*1.2);c.lineTo(x-r*1.2,y);c.closePath()}
+ else if(type==="mdf"){for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5;i?c.lineTo(x+r*1.1*Math.cos(a),y+r*1.1*Math.sin(a)):c.moveTo(x+r*1.1*Math.cos(a),y+r*1.1*Math.sin(a))}c.closePath()}
+ else{for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.5:r*1.45;i?c.lineTo(x+q*Math.cos(a),y+q*Math.sin(a)):c.moveTo(x+q*Math.cos(a),y+q*Math.sin(a))}c.closePath()}}
+const wood=s=>s[st.mode==="S"?"sS":"sR"];
+const rad=s=>{const v=wood(s);return (2.3+4.6*Math.sqrt(v/700))*(s.type==="paper"?1.15:1)};
+function setData(c){c.setTransform(dpr*k,0,0,-dpr*k,dpr*ox,dpr*oy)}
+function renderBase(){
+ base.width=Math.round(W*dpr);base.height=Math.round(H*dpr);const b=base.getContext("2d");
+ b.setTransform(dpr,0,0,dpr,0,0);b.fillStyle=C.water;b.fillRect(0,0,W,H);
+ setData(b);b.lineJoin="round";
+ const cells=modeKey()==="S"?PS:PR,spot=st.sel>=0;
+ for(const g of D.grat){b.beginPath();g.forEach((q,i)=>i?b.lineTo(q[0],q[1]):b.moveTo(q[0],q[1]));b.strokeStyle=C.grat;b.lineWidth=.8/k;b.setLineDash([2/k,3/k]);b.stroke()}b.setLineDash([]);
+ for(const s of S){const c=cls(val(s));b.globalAlpha=spot&&s.i!==st.sel?.3:1;b.fillStyle=C.cls[c];b.fill(cells[s.i],"evenodd")}b.globalAlpha=1;
+ b.strokeStyle=C.edge;b.lineWidth=1.3/k;for(const s of S)b.stroke(cells[s.i]);
+ if(st.mode==="B"){b.strokeStyle=C.dash;b.lineWidth=1.5/k;b.setLineDash([7/k,5/k]);for(const s of S)b.stroke(PS[s.i]);b.setLineDash([])}
+ b.strokeStyle=C.state;b.lineWidth=.9/k;for(const p of stP)b.stroke(p);
+ b.setTransform(dpr,0,0,dpr,0,0);
+ for(const s of [...S].sort((a,c)=>wood(c)-wood(a))){const x=ox+k*s.x,y=oy-k*s.y;if(x<-20||x>W+20||y<-20||y>H+20)continue;
+  b.globalAlpha=spot&&s.i!==st.sel?.45:1;shape(b,s.type,x,y,rad(s)*Math.min(1.35,Math.max(.85,k*3.2)));b.fillStyle=C.mill;b.fill();b.lineWidth=1.4;b.strokeStyle=C.millHalo;b.stroke()}b.globalAlpha=1;
+ labels(b);
+ baseT={k,ox,oy};baseDirty=false}
+const FF="Candara,'Segoe UI',system-ui,sans-serif";
+function labels(b){const fs=Math.max(10,Math.min(15,10+k*8)),boxes=[];
+ const free=(x,y,w,h)=>{for(const q of boxes)if(!(x+w<q[0]||q[0]+q[2]<x||y+h<q[1]||q[1]+q[3]<y))return false;boxes.push([x,y,w,h]);return true};
+ for(const s of S){const x=ox+k*s.x,y=oy-k*s.y;boxes.push([x-9,y-9,18,18])}
+ b.textBaseline="middle";b.textAlign="center";b.lineJoin="round";
+ const put=(t,x,y,font,col,bold)=>{b.font=font;const w=b.measureText(t).width;if(x<w/2||x>W-w/2||y<8||y>H-8||!free(x-w/2-2,y-fs/2-1,w+4,fs+2))return false;b.lineWidth=3.2;b.strokeStyle=C.halo;b.strokeText(t,x,y);b.fillStyle=col;b.fillText(t,x,y);return true};
+ if(st.labels){const sel=st.sel>=0?S[st.sel]:null;
+  if(sel){b.textAlign="left";const x=ox+k*sel.x+10,y=oy-k*sel.y-12;b.font="700 "+(fs+2)+"px "+FF;const t=sel.name+", "+sel.st,w=b.measureText(t).width;b.lineWidth=3.6;b.strokeStyle=C.halo;b.strokeText(t,Math.min(x,W-w-4),Math.max(14,y));b.fillStyle=C.ink;b.fillText(t,Math.min(x,W-w-4),Math.max(14,y));b.textAlign="center"}
+  for(const s of D.sl){put(s[1],ox+k*s[2],oy-k*s[3],"700 "+fs+"px "+FF,C.mut)}
+  const top=[...S].sort((a,c)=>wood(c)-wood(a)).slice(0,k<.5?6:12);
+  b.textAlign="left";for(const s of top){if(s.i===st.sel)continue;const x=ox+k*s.x+9,y=oy-k*s.y-10;b.font="700 "+(fs-1)+"px "+FF;const w=b.measureText(s.name).width;if(x+w>W||y<8||!free(x-2,y-fs/2-1,w+4,fs+2))continue;b.lineWidth=3.2;b.strokeStyle=C.halo;b.strokeText(s.name,x,y);b.fillStyle=C.ink;b.fillText(s.name,x,y)}b.textAlign="center"}
+ b.font="italic 400 "+(fs+2)+"px "+FF;b.fillStyle=C.wlab;for(const w of D.water){const lines=w[0].split("\n"),x=ox+k*w[1],y=oy-k*w[2];lines.forEach((t,i)=>b.fillText(t,x,y+(i-(lines.length-1)/2)*(fs+4)))}
+ b.font="600 "+fs+"px "+FF;b.fillStyle=C.mut;b.fillText("MEXICO",ox+k*D.mexico[0],oy-k*D.mexico[1]);b.fillText("CANADA",ox+k*-100,oy-k*1520)}
+function scaleBar(c){const nice=[10,20,50,100,200,500,1000],target=110/k;let km=nice[0];for(const n of nice)if(n<=target)km=n;const px=km*k,x0=12,y0=H-16;
+ c.fillStyle=C.ink;c.strokeStyle=C.ink;c.lineWidth=1;c.fillRect(x0,y0-4,px/2,4);c.strokeRect(x0,y0-4,px,4);c.font="600 11px "+FF;c.textAlign="left";c.textBaseline="bottom";c.lineWidth=3;c.strokeStyle=C.halo;c.strokeText(km+" km",x0,y0-7);c.fillStyle=C.ink;c.fillText(km+" km",x0,y0-7)}
+function draw(){
+ if(baseDirty&&!gesturing)renderBase();
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ if(gesturing&&baseT){const s=k/baseT.k;ctx.fillStyle=C.water;ctx.fillRect(0,0,W,H);ctx.setTransform(dpr*s,0,0,dpr*s,dpr*(ox-s*baseT.ox),dpr*(oy-s*baseT.oy));ctx.drawImage(base,0,0,W,H);ctx.setTransform(dpr,0,0,dpr,0,0)}
+ else ctx.drawImage(base,0,0,W,H);
+ if(st.sel>=0){const i=st.sel;setData(ctx);ctx.lineJoin="round";
+  ctx.strokeStyle=C.sel;ctx.lineWidth=2.6/k;if(st.mode==="B"||st.mode==="S"){ctx.setLineDash(st.mode==="B"?[7/k,5/k]:[]);ctx.stroke(PS[i]);ctx.setLineDash([])}
+  if(st.mode!=="S"){ctx.strokeStyle=C.ink;ctx.lineWidth=3.4/k;ctx.stroke(PR[i]);ctx.strokeStyle=C.sel;ctx.lineWidth=1.7/k;ctx.stroke(PR[i])}
+  ctx.setTransform(dpr,0,0,dpr,0,0);const s=S[i],x=ox+k*s.x,y=oy-k*s.y;shape(ctx,s.type,x,y,rad(s)*1.35);ctx.fillStyle=C.mill;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle=C.sel;ctx.stroke()}
+ scaleBar(ctx)}
+/* ---- gestures ---- */
+const ptrs=new Map();let pinch=null,moved=0,down=null;
+const rel=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+function rebaseSoon(){clearTimeout(rb);rb=setTimeout(()=>{gesturing=false;baseDirty=true;draw()},110)}
+cv.addEventListener("pointerdown",e=>{cancelAnimationFrame(anim);cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,rel(e));gesturing=true;touched=true;moved=0;$("#hint").style.display="none";
+ if(ptrs.size===1)down=rel(e);if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),k,ox,oy,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2}}});
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;const p=ptrs.get(e.pointerId),n=rel(e);
+ if(ptrs.size===2&&pinch){ptrs.set(e.pointerId,n);const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,mx=(pinch.cx-pinch.ox)/pinch.k,my=(pinch.oy-pinch.cy)/pinch.k;
+  k=Math.max(fitK*.7,Math.min(pinch.k*d/pinch.d,8));ox=cx-k*mx;oy=cy+k*my;moved=99;draw()}
+ else if(ptrs.size===1){const dx=n.x-p.x,dy=n.y-p.y;moved+=Math.abs(dx)+Math.abs(dy);ptrs.set(e.pointerId,n);if(moved>6){ox+=dx;oy+=dy;draw()}}});
+const endp=e=>{if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);pinch=null;if(ptrs.size===1)moved=99;
+ if(ptrs.size===0){if(moved<=6&&down&&e.type==="pointerup")tap(down.x,down.y);rebaseSoon()}};
+cv.addEventListener("pointerup",endp);cv.addEventListener("pointercancel",endp);
+function zoomAt(f,ax,ay){const mx=(ax-ox)/k,my=(oy-ay)/k;k=Math.max(fitK*.7,Math.min(k*f,8));ox=ax-k*mx;oy=ay+k*my}
+cv.addEventListener("wheel",e=>{e.preventDefault();cancelAnimationFrame(anim);touched=true;const p=rel(e);gesturing=true;zoomAt(Math.exp(-e.deltaY*(e.ctrlKey?.01:.0016)),p.x,p.y);draw();rebaseSoon()},{passive:false});
+cv.addEventListener("dblclick",e=>{const p=rel(e);touched=true;zoomAt(1.8,p.x,p.y);baseDirty=true;draw()});
+const zoomBy=f=>{cancelAnimationFrame(anim);touched=true;zoomAt(f,W/2,H/2);baseDirty=true;draw()};
+$("#zin").onclick=()=>zoomBy(1.6);$("#zout").onclick=()=>zoomBy(1/1.6);$("#zreset").onclick=()=>{select(-1);touched=false;flyTo(boxView(-2380,2290,-1380,1600,.98))};
+/* ---- selection ---- */
+function tap(px,py){let best=-1,bd=18;for(const s of S){const d=Math.hypot(ox+k*s.x-px,oy-k*s.y-py);if(d<bd){bd=d;best=s.i}}
+ if(best<0){const cells=modeKey()==="S"?PS:PR;probe.setTransform(1,0,0,-1,0,0);setData2(probe);for(const s of S){if(probe.isPointInPath(cells[s.i],px,py,"evenodd")){best=s.i;break}}}
+ select(best===st.sel?-1:best,true)}
+function setData2(c){c.setTransform(k,0,0,-k,ox,oy)}
+function select(i,fly){st.sel=i;$("#millSel").value=i<0?"":String(i);card();baseDirty=true;draw();hash();
+ if(i>=0&&fly){const b1=BS[i],b2=BR[i],pad=60;const x0=Math.min(b1[0],b2[0],S[i].x-80),x1=Math.max(b1[1],b2[1],S[i].x+80),y0=Math.min(b1[2],b2[2],S[i].y-80),y1=Math.max(b1[3],b2[3],S[i].y+80);flyTo(boxView(x0-pad,x1+pad,y0-pad,y1+pad,.9));if(innerWidth<900)wrap.scrollIntoView({block:"start",behavior:"smooth"})}}
+function card(){const el=$("#card");if(st.sel<0){el.innerHTML="";return}const s=S[st.sel],ch=(a,b)=>{const d=b-a;return (d>=0?"+":"−")+nf(Math.abs(d),0)};
+ el.innerHTML=`<div class="card"><h3>${s.name}, ${s.st}</h3><p class="sub">${MLAB[s.type]||s.type}${s.co?" · "+s.co:""}${s.n>1?" · 2 mills at one point":""}</p>
+ <table><tr><th></th><th>Straight line</th><th>Road time</th></tr>
+ <tr><td>Area, km²</td><td>${nf(s.aS)}</td><td>${nf(s.aR)}</td></tr>
+ <tr><td>Wood inside, M ft³/yr</td><td>${nf(s.sS)}</td><td>${nf(s.sR)}</td></tr>
+ <tr><td>Wood per km², k ft³/yr</td><td>${nf(s.dS,1)}</td><td>${nf(s.dR,1)}</td></tr></table>
+ <p class="note" style="margin:8px 0 0">${nf(s.kept*100)}% of the straight-line polygon is also in the road-time polygon. Wood in the road-time polygon is on average ${nf(s.min)} minutes from this mill by road. Within 120 minutes this mill receives ${nf(s.alloc)} M ft³/yr (Forest to Mill allocation).</p></div>`}
+/* ---- panel ---- */
+function legend(){const v=VAR[st.v],b=BRK[st.v],cnt=[0,0,0,0,0];S.forEach(s=>cnt[cls(val(s))]++);$("#legTitle").textContent=v.t;$("#legNote").textContent=v.note+" Unit: "+v.u+". Five quintile classes of both versions together.";
+ let h="";for(let c=4;c>=0;c--)h+=`<span class="sw" style="background:${C.cls[c]}"></span><span>${nf(b[c],v.d)} to ${nf(b[c+1],v.d)}</span><span class="cnt">${cnt[c]} polygons</span>`;$("#legend").innerHTML=h;
+ const types=["pulp","sawmill","osb","plywood","mdf","paper"],cc=Object.fromEntries(types.map(t=>[t,S.filter(s=>s.type===t).length]));
+ $("#keys").innerHTML=types.map(t=>{const c=document.createElement("canvas");c.width=c.height=20;const g=c.getContext("2d");shape(g,t,10,10,6.5);g.fillStyle=C.mill;g.fill();return `<span><img alt="" width="20" height="20" src="${c.toDataURL()}">${MLAB[t]} (${cc[t]})</span>`}).join("")+`<span>Symbol size = wood inside</span>`;
+ $("#cmpNote").style.display=st.mode==="B"?"block":"none"}
+function lists(){const d=S.map(s=>({s,d:s.sR-s.sS})).sort((a,b)=>b.d-a.d);
+ const li=(x,c)=>`<li><button data-i="${x.s.i}"><span>${x.s.name}, ${x.s.st}</span><span class="${c}">${x.d>=0?"+":"−"}${nf(Math.abs(x.d))} M ft³/yr</span></button></li>`;
+ $("#gain").innerHTML=d.slice(0,5).map(x=>li(x,"up")).join("");$("#lose").innerHTML=d.slice(-5).reverse().map(x=>li(x,"dn")).join("");
+ document.querySelectorAll(".list button").forEach(b=>b.onclick=()=>select(+b.dataset.i,true));
+ $("#facts").textContent=`By road, the nearest mill is a different one for ${nf(100-D.facts.agreeLand*100,1)}% of the land and for ${nf(D.facts.woodChanged*100,1)}% of the wood. The polygon that grows most in area is ${D.facts.grow}; the one that shrinks most is ${D.facts.shrink}.`}
+function seg(id,key,fn){document.querySelectorAll(id+" button").forEach(b=>b.onclick=()=>{st[key]=b.dataset.v;document.querySelectorAll(id+" button").forEach(x=>x.setAttribute("aria-pressed",x===b));fn();hash()})}
+function refresh(){legend();card();baseDirty=true;draw()}
+seg("#modeSeg","mode",refresh);seg("#varSeg","v",refresh);
+$("#labelBtn").onclick=e=>{st.labels=!st.labels;e.target.textContent=st.labels?"Labels on":"Labels off";e.target.setAttribute("aria-pressed",st.labels);baseDirty=true;draw()};
+const sel=$("#millSel");S.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement("option");o.value=s.i;o.textContent=s.name+", "+s.st;sel.appendChild(o)});
+sel.onchange=()=>select(sel.value===""?-1:+sel.value,true);
+function setTheme(t,save){st.theme=t;document.documentElement.dataset.theme=t;C=PAL[t];$("#themeBtn").textContent=t==="dark"?"Light map":"Dark map";wrap.style.background=C.water;legend();gesturing=false;baseDirty=true;draw();if(save){try{localStorage.setItem("vor-theme",t)}catch(e){}}}
+$("#themeBtn").onclick=()=>setTheme(st.theme==="dark"?"light":"dark",true);
+/* ---- deep links: #mill=ID&mode=R&var=dens ---- */
+function hash(){const p=new URLSearchParams();if(st.sel>=0)p.set("mill",S[st.sel].id);if(st.mode!=="S")p.set("mode",st.mode);if(st.v!=="dens")p.set("var",st.v);history.replaceState(null,"",p.toString()?"#"+p:location.pathname+location.search)}
+function fromHash(){const p=new URLSearchParams(location.hash.slice(1));
+ if(["S","R","B"].includes(p.get("mode"))){st.mode=p.get("mode");document.querySelectorAll("#modeSeg button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===st.mode))}
+ if(VAR[p.get("var")]){st.v=p.get("var");document.querySelectorAll("#varSeg button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===st.v))}
+ const m=S.find(s=>s.id===p.get("mill"));if(m)st.sel=m.i}
+addEventListener("resize",resize);
+let t0="";try{t0=localStorage.getItem("vor-theme")||""}catch(e){}
+fromHash();lists();resize();
+setTheme(t0==="dark"||t0==="light"?t0:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+if(st.sel>=0){sel.value=st.sel;card();select(st.sel,true)}
+</script>
+</body>
+</html>
